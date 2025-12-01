@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة المركبات - مصنع البهنساوي</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- صفحة تسجيل الدخول -->
+    <div id="loginPage" class="login-page">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1>مصنع البهنساوي</h1>
+                    <p>نظام إدارة المركبات والصيانة</p>
+                </div>
+
+                <div class="login-tabs">
+                    <button class="tab-btn active" onclick="switchTab('login')">تسجيل دخول</button>
+                    <button class="tab-btn" onclick="switchTab('register')">مستخدم جديد</button>
+                </div>
+
+                <!-- فورم الدخول -->
+                <form id="loginForm" class="login-form active-form" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>اسم المستخدم:</label>
+                        <input type="text" id="loginUsername" required placeholder="أدخل اسم المستخدم">
+                    </div>
+                    <div class="form-group">
+                        <label>كلمة المرور:</label>
+                        <input type="password" id="loginPassword" required placeholder="أدخل كلمة المرور">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">دخول</button>
+                    <div id="loginError" class="error-message"></div>
+                </form>
+
+                <!-- فورم التسجيل -->
+                <form id="registerForm" class="login-form" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>اسم المستخدم:</label>
+                        <input type="text" id="regUsername" required placeholder="أختر اسم مستخدم">
+                    </div>
+                    <div class="form-group">
+                        <label>كلمة المرور:</label>
+                        <input type="password" id="regPassword" required placeholder="أدخل كلمة المرور">
+                    </div>
+                    <div class="form-group">
+                        <label>تأكيد كلمة المرور:</label>
+                        <input type="password" id="regPasswordConfirm" required placeholder="أعد إدخال كلمة المرور">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">تسجيل</button>
+                    <div id="registerError" class="error-message"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- النظام الرئيسي -->
+    <div class="container" id="mainSystem" style="display: none;">
+        <!-- الرأس -->
+        <header class="header">
+            <div class="header-content">
+                <h1>مصنع البهنساوي</h1>
+                <p class="subtitle">نظام إدارة المركبات والصيانة</p>
+            </div>
+            <div class="header-info">
+                <button class="btn btn-print" onclick="printPage()" title="طباعة الصفحة">🖨️ طباعة</button>
+                <span class="date-time" id="dateTime"></span>
+                <div class="user-info">
+                    <span id="currentUser"></span>
+                    <button class="btn btn-danger" onclick="handleLogout()" title="تسجيل خروج">خروج</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- الشريط الجانبي -->
+        <nav class="sidebar">
+            <ul class="nav-menu">
+                <li><a href="#" data-section="dashboard" class="nav-link active">📊 لوحة التحكم</a></li>
+                <li><a href="#" data-section="vehicles" class="nav-link">🚗 المركبات</a></li>
+                <li><a href="#" data-section="maintenance" class="nav-link">🔧 الصيانة والتصليح</a></li>
+                <li><a href="#" data-section="violations" class="nav-link">⚠️ المخالفات</a></li>
+                <li><a href="#" data-section="licenses" class="nav-link">📋 الرخص</a></li>
+                <li><a href="#" data-section="expenses" class="nav-link">💰 النفقات</a></li>
+                <li><a href="#" data-section="advance" class="nav-link">💳 العهدة</a></li>
+                <li><a href="#" data-section="reports" class="nav-link">📈 التقارير</a></li>
+                <li><a href="#" data-section="settings" class="nav-link">⚙️ الإعدادات</a></li>
+            </ul>
+        </nav>
+
+        <!-- المحتوى الرئيسي -->
+        <main class="main-content">
+            <!-- لوحة التحكم -->
+            <section id="dashboard" class="section active">
+                <div class="section-header">
+                    <h2>لوحة التحكم</h2>
+                </div>
+                <div class="dashboard-grid">
+                    <div class="card stat-card">
+                        <div class="stat-icon">🚗</div>
+                        <div class="stat-content">
+                            <h3>إجمالي المركبات</h3>
+                            <p class="stat-number" id="totalVehicles">0</p>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-content">
+                            <h3>رخص منتهية قريباً</h3>
+                            <p class="stat-number" id="expiringLicenses">0</p>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon">🔧</div>
+                        <div class="stat-content">
+                            <h3>في الصيانة</h3>
+                            <p class="stat-number" id="inMaintenance">0</p>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-content">
+                            <h3>تكاليف الصيانة (هذا الشهر)</h3>
+                            <p class="stat-number" id="monthlyExpenses">0 جنيه</p>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-content">
+                            <h3>إجمالي المخالفات</h3>
+                            <p class="stat-number" id="totalViolations">0</p>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon">💳</div>
+                        <div class="stat-content">
+                            <h3>المخالفات المعلقة</h3>
+                            <p class="stat-number" id="pendingViolations">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alerts-section card">
+                    <h3>🔔 التنبيهات الهامة</h3>
+                    <div id="alertsList" class="alerts-list">
+                        <p class="empty-message">لا توجد تنبيهات</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- إدارة المركبات -->
+            <section id="vehicles" class="section">
+                <div class="section-header">
+                    <h2>إدارة المركبات</h2>
+                    <button class="btn btn-primary" onclick="openVehicleModal()">+ إضافة مركبة جديدة</button>
+                </div>
+
+                <div class="filters">
+                    <input type="text" id="vehicleSearch" placeholder="ابحث عن مركبة..." class="search-input">
+                    <select id="vehicleStatusFilter" class="filter-select">
+                        <option value="">جميع الحالات</option>
+                        <option value="نشطة">نشطة</option>
+                        <option value="في الصيانة">في الصيانة</option>
+                        <option value="معطوبة">معطوبة</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>اللوحة</th>
+                                <th>النموذج</th>
+                                <th>السنة</th>
+                                <th>الحالة</th>
+                                <th>انتهاء الرخصة</th>
+                                <th>عدد المخالفات</th>
+                                <th>المبلغ المدفوع (جنيه)</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehiclesTable">
+                            <tr class="empty-row">
+                                <td colspan="8">لا توجد مركبات</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- الصيانة والتصليح -->
+            <section id="maintenance" class="section">
+                <div class="section-header">
+                    <h2>الصيانة والتصليح</h2>
+                    <button class="btn btn-primary" onclick="openMaintenanceModal()">+ تسجيل صيانة جديدة</button>
+                </div>
+
+                <div class="filters">
+                    <input type="text" id="maintenanceSearch" placeholder="ابحث عن لوحة المركبة..." class="search-input">
+                    <select id="maintenanceStatusFilter" class="filter-select">
+                        <option value="">جميع الحالات</option>
+                        <option value="قيد الإجراء">قيد الإجراء</option>
+                        <option value="مكتملة">مكتملة</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>اللوحة</th>
+                                <th>نوع الصيانة</th>
+                                <th>التاريخ</th>
+                                <th>التكلفة</th>
+                                <th>الحالة</th>
+                                <th>الملاحظات</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="maintenanceTable">
+                            <tr class="empty-row">
+                                <td colspan="7">لا توجد سجلات صيانة</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- المخالفات -->
+            <section id="violations" class="section">
+                <div class="section-header">
+                    <h2>المخالفات المرورية</h2>
+                    <button class="btn btn-primary" onclick="openViolationModal()">+ تسجيل مخالفة جديدة</button>
+                </div>
+
+                <div class="filters">
+                    <input type="text" id="violationSearch" placeholder="ابحث عن لوحة المركبة..." class="search-input">
+                    <select id="violationStatusFilter" class="filter-select">
+                        <option value="">جميع الحالات</option>
+                        <option value="مسددة">مسددة</option>
+                        <option value="معلقة">معلقة</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>اللوحة</th>
+                                <th>نوع المخالفة</th>
+                                <th>التاريخ</th>
+                                <th>المبلغ (جنيه)</th>
+                                <th>الحالة</th>
+                                <th>الملاحظات</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="violationsTable">
+                            <tr class="empty-row">
+                                <td colspan="7">لا توجد مخالفات مسجلة</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- الرخص -->
+            <section id="licenses" class="section">
+                <div class="section-header">
+                    <h2>تتبع الرخص</h2>
+                </div>
+
+                <div class="filters">
+                    <input type="text" id="licenseSearch" placeholder="ابحث عن مركبة..." class="search-input">
+                    <select id="licenseStatusFilter" class="filter-select">
+                        <option value="">جميع الحالات</option>
+                        <option value="سارية">سارية</option>
+                        <option value="منتهية">منتهية</option>
+                        <option value="قريبة الانتهاء">قريبة الانتهاء</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>اللوحة</th>
+                                <th>رقم الرخصة</th>
+                                <th>تاريخ الإصدار</th>
+                                <th>تاريخ الانتهاء</th>
+                                <th>الأيام المتبقية</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="licensesTable">
+                            <tr class="empty-row">
+                                <td colspan="6">لا توجد بيانات رخص</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- النفقات -->
+            <section id="expenses" class="section">
+                <div class="section-header">
+                    <h2>إدارة النفقات</h2>
+                    <button class="btn btn-primary" onclick="openExpensesModal()">+ إضافة نفقة جديدة</button>
+                </div>
+
+                <div class="filters">
+                    <input type="text" id="expensesSearch" placeholder="ابحث عن نفقة..." class="search-input">
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>اللوحة</th>
+                                <th>نوع النفقة</th>
+                                <th>التاريخ</th>
+                                <th>المبلغ (جنيه)</th>
+                                <th>الملاحظات</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesTable">
+                            <tr class="empty-row">
+                                <td colspan="6">لا توجد نفقات مسجلة</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- العهدة -->
+            <section id="advance" class="section">
+                <div class="section-header">
+                    <h2>إدارة العهدة</h2>
+                    <button class="btn btn-primary" onclick="openAdvanceModal()">+ إضافة عهدة جديدة</button>
+                </div>
+
+                <div class="card">
+                    <h3>ملخص العهدة</h3>
+                    <div class="advance-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">العهدة المتاحة:</span>
+                            <span class="summary-value" id="totalAdvance">0 جنيه</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">المصروف من العهدة:</span>
+                            <span class="summary-value" id="usedAdvance">0 جنيه</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">المتبقي من العهدة:</span>
+                            <span class="summary-value" id="remainingAdvance">0 جنيه</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>المبلغ (جنيه)</th>
+                                <th>التاريخ</th>
+                                <th>الحالة</th>
+                                <th>الملاحظات</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="advanceTable">
+                            <tr class="empty-row">
+                                <td colspan="5">لا توجد عهد مسجلة</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- التقارير -->
+            <section id="reports" class="section">
+                <div class="section-header">
+                    <h2>التقارير</h2>
+                </div>
+
+                <div class="reports-grid">
+                    <div class="card report-card">
+                        <h3>📋 تقرير المركبات</h3>
+                        <p>قائمة شاملة بجميع المركبات وحالاتها</p>
+                        <div class="report-buttons">
+                            <button class="btn btn-small btn-primary" onclick="generateVehiclesReportPDF()">PDF</button>
+                            <button class="btn btn-small btn-success" onclick="generateVehiclesReportExcel()">Excel</button>
+                            <button class="btn btn-small btn-info" onclick="printVehiclesReport()">طباعة</button>
+                        </div>
+                    </div>
+
+                    <div class="card report-card">
+                        <h3>🔧 تقرير الصيانة</h3>
+                        <p>تفاصيل جميع عمليات الصيانة والتصليح</p>
+                        <div class="report-buttons">
+                            <button class="btn btn-small btn-primary" onclick="generateMaintenanceReportPDF()">PDF</button>
+                            <button class="btn btn-small btn-success" onclick="generateMaintenanceReportExcel()">Excel</button>
+                            <button class="btn btn-small btn-info" onclick="printMaintenanceReport()">طباعة</button>
+                        </div>
+                    </div>
+
+                    <div class="card report-card">
+                        <h3>💰 تقرير المصروفات</h3>
+                        <p>ملخص تكاليف الصيانة حسب الفترة الزمنية</p>
+                        <div class="report-buttons">
+                            <button class="btn btn-small btn-primary" onclick="generateExpensesReportPDF()">PDF</button>
+                            <button class="btn btn-small btn-success" onclick="generateExpensesReportExcel()">Excel</button>
+                            <button class="btn btn-small btn-info" onclick="printExpensesReport()">طباعة</button>
+                        </div>
+                    </div>
+
+                    <div class="card report-card">
+                        <h3>📋 تقرير الرخص</h3>
+                        <p>حالة جميع رخص المركبات والتنبيهات</p>
+                        <div class="report-buttons">
+                            <button class="btn btn-small btn-primary" onclick="generateLicensesReportPDF()">PDF</button>
+                            <button class="btn btn-small btn-success" onclick="generateLicensesReportExcel()">Excel</button>
+                            <button class="btn btn-small btn-info" onclick="printLicensesReport()">طباعة</button>
+                        </div>
+                    </div>
+
+                    <div class="card report-card">
+                        <h3>⚠️ تقرير المخالفات</h3>
+                        <p>تفاصيل جميع المخالفات المرورية والمدفوعات</p>
+                        <div class="report-buttons">
+                            <button class="btn btn-small btn-primary" onclick="generateViolationsReportPDF()">PDF</button>
+                            <button class="btn btn-small btn-success" onclick="generateViolationsReportExcel()">Excel</button>
+                            <button class="btn btn-small btn-info" onclick="printViolationsReport()">طباعة</button>
+                        </div>
+                    </div>
+
+                    <div class="card report-card">
+                        <h3>💰 تقرير النفقات والعهدة</h3>
+                        <p>تفاصيل النفقات والعهدة مع التوقيعات الرسمية</p>
+                        <div class="report-buttons">
+                            <button class="btn btn-small btn-primary" onclick="generateAdvanceExpensesReportPDF()">PDF</button>
+                            <button class="btn btn-small btn-success" onclick="generateAdvanceExpensesReportExcel()">Excel</button>
+                            <button class="btn btn-small btn-info" onclick="printAdvanceExpensesReport()">طباعة</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- الإعدادات -->
+            <section id="settings" class="section">
+                <div class="section-header">
+                    <h2>الإعدادات</h2>
+                </div>
+
+                <div class="card">
+                    <h3>إدارة البيانات</h3>
+                    <div class="settings-group">
+                        <label>عدد أيام التحذير قبل انتهاء الرخصة:</label>
+                        <input type="number" id="licenseWarningDays" min="1" max="365" value="20">
+                        <button class="btn btn-primary" onclick="saveLicenseWarningDays()">حفظ</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>خطر - حذف البيانات</h3>
+                    <p style="color: #e74c3c;">تحذير: هذا الإجراء سيحذف جميع البيانات بشكل نهائي</p>
+                    <button class="btn btn-danger" onclick="confirmClearAllData()">حذف جميع البيانات</button>
+                </div>
+
+                <div class="card">
+                    <h3>عن النظام</h3>
+                    <p><strong>الإصدار:</strong> 1.0</p>
+                    <p><strong>آخر تحديث:</strong> <span id="lastUpdate"></span></p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- نمودج إضافة/تعديل مركبة -->
+    <div id="vehicleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeVehicleModal()">&times;</span>
+            <h2 id="vehicleModalTitle">إضافة مركبة جديدة</h2>
+            <form id="vehicleForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>لوحة المركبة *</label>
+                        <input type="text" id="plateNumber" required placeholder="مثال: س ع د 123">
+                    </div>
+                    <div class="form-group">
+                        <label>نموذج المركبة *</label>
+                        <input type="text" id="vehicleModel" required placeholder="مثال: تويوتا كامري">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>سنة الصنع *</label>
+                        <input type="number" id="vehicleYear" required min="1990" max="2100">
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الهيكل VIN</label>
+                        <input type="text" id="vinNumber" placeholder="رقم الهيكل الفريد">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>الحالة الحالية *</label>
+                        <select id="vehicleStatus" required>
+                            <option value="نشطة">نشطة</option>
+                            <option value="في الصيانة">في الصيانة</option>
+                            <option value="معطوبة">معطوبة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الرخصة *</label>
+                        <input type="text" id="licenseNumber" required placeholder="رقم الرخصة">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>تاريخ انتهاء الرخصة *</label>
+                        <input type="date" id="licenseExpiry" required>
+                    </div>
+                    <div class="form-group">
+                        <label>عدد المخالفات</label>
+                        <input type="number" id="violationCount" min="0" value="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>المبلغ المدفوع من المخالفات (جنيه)</label>
+                        <input type="number" id="violationPaid" min="0" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>ملاحظات</label>
+                        <textarea id="vehicleNotes" rows="2" placeholder="ملاحظات عن المركبة"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeVehicleModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نمودج إضافة صيانة -->
+    <div id="maintenanceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeMaintenanceModal()">&times;</span>
+            <h2>تسجيل صيانة جديدة</h2>
+            <form id="maintenanceForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>لوحة المركبة *</label>
+                        <select id="maintenanceVehicle" required>
+                            <option value="">اختر مركبة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>نوع الصيانة *</label>
+                        <select id="maintenanceType" required>
+                            <option value="">اختر النوع</option>
+                            <option value="صيانة دورية">صيانة دورية</option>
+                            <option value="إصلاح محرك">إصلاح محرك</option>
+                            <option value="إصلاح فرامل">إصلاح فرامل</option>
+                            <option value="استبدال إطارات">استبدال إطارات</option>
+                            <option value="صيانة كهربائية">صيانة كهربائية</option>
+                            <option value="إصلاح هيكل">إصلاح هيكل</option>
+                            <option value="صيانة تبريد">صيانة تبريد</option>
+                            <option value="أخرى">أخرى</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>التاريخ *</label>
+                        <input type="date" id="maintenanceDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>التكلفة (جنيه) *</label>
+                        <input type="number" id="maintenanceCost" required min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>الحالة *</label>
+                        <select id="maintenanceStatus" required>
+                            <option value="قيد الإجراء">قيد الإجراء</option>
+                            <option value="مكتملة">مكتملة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الملاحظات</label>
+                        <textarea id="maintenanceNotes" rows="2" placeholder="تفاصيل الصيانة"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeMaintenanceModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نمودج إضافة مخالفة -->
+    <div id="violationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeViolationModal()">&times;</span>
+            <h2>تسجيل مخالفة جديدة</h2>
+            <form id="violationForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>لوحة المركبة *</label>
+                        <select id="violationVehicle" required>
+                            <option value="">اختر مركبة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>نوع المخالفة *</label>
+                        <select id="violationType" required>
+                            <option value="">اختر النوع</option>
+                            <option value="تجاوز السرعة">تجاوز السرعة</option>
+                            <option value="عدم الالتزام بالحزام">عدم الالتزام بالحزام</option>
+                            <option value="قيادة متهورة">قيادة متهورة</option>
+                            <option value="مخالفة ضوء">مخالفة ضوء</option>
+                            <option value="وقوف غير مصرح">وقوف غير مصرح</option>
+                            <option value="عدم صيانة المركبة">عدم صيانة المركبة</option>
+                            <option value="رخصة منتهية">رخصة منتهية</option>
+                            <option value="أخرى">أخرى</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>التاريخ *</label>
+                        <input type="date" id="violationDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>المبلغ (جنيه) *</label>
+                        <input type="number" id="violationAmount" required min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>الحالة *</label>
+                        <select id="violationStatus" required>
+                            <option value="معلقة">معلقة</option>
+                            <option value="مسددة">مسددة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الملاحظات</label>
+                        <textarea id="violationNotes" rows="2" placeholder="تفاصيل المخالفة"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeViolationModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نمودج إضافة نفقة -->
+    <div id="expensesModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeExpensesModal()">&times;</span>
+            <h2 id="expensesModalTitle">إضافة نفقة جديدة</h2>
+            <form id="expensesForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>لوحة المركبة</label>
+                        <select id="expensesVehicle">
+                            <option value="">اختر مركبة (اختياري)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>نوع النفقة *</label>
+                        <div style="display: flex; gap: 10px;">
+                            <select id="expensesType" required style="flex: 1;">
+                                <option value="">اختر النوع أو اكتب مخصص</option>
+                                <option value="صيانة دورية">صيانة دورية</option>
+                                <option value="إصلاح محرك">إصلاح محرك</option>
+                                <option value="إصلاح فرامل">إصلاح فرامل</option>
+                                <option value="استبدال إطارات">استبدال إطارات</option>
+                                <option value="صيانة كهربائية">صيانة كهربائية</option>
+                                <option value="غسيل وتلميع">غسيل وتلميع</option>
+                                <option value="تأمين">تأمين</option>
+                                <option value="مسحات">مسحات</option>
+                                <option value="وقود">وقود</option>
+                            </select>
+                            <input type="text" id="customExpenseType" placeholder="أو اكتب نوع مخصص" style="flex: 1;">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>التاريخ *</label>
+                        <input type="date" id="expensesDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>المبلغ (جنيه) *</label>
+                        <input type="number" id="expensesAmount" required min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ربط بعهدة (اختياري)</label>
+                        <select id="expensesAdvance">
+                            <option value="">لم ترتبط بعهدة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الملاحظات</label>
+                        <textarea id="expensesNotes" rows="2" placeholder="تفاصيل النفقة"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeExpensesModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نموذج إضافة عهدة -->
+    <div id="advanceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAdvanceModal()">&times;</span>
+            <h2 id="advanceModalTitle">إضافة عهدة جديدة</h2>
+            <form id="advanceForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>المبلغ (جنيه) *</label>
+                        <input type="number" id="advanceAmount" required min="0" step="0.01" placeholder="أدخل مبلغ العهدة">
+                    </div>
+                    <div class="form-group">
+                        <label>التاريخ *</label>
+                        <input type="date" id="advanceDate" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="grid-column: 1/-1;">
+                        <label>الملاحظات</label>
+                        <textarea id="advanceNotes" rows="3" placeholder="ملاحظات عن العهدة"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAdvanceModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
