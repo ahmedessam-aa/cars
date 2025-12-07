@@ -1172,6 +1172,7 @@ function generateVehiclesReportHTML() {
                     <tr style="background-color: #1a252f; color: white;">
                         <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">اللوحة</th>
                         <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">النموذج</th>
+                        <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">اسم السائق</th>
                         <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">السنة</th>
                         <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">الحالة</th>
                         <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">انتهاء الرخصة</th>
@@ -1183,7 +1184,7 @@ function generateVehiclesReportHTML() {
 
     appData.vehicles.forEach((vehicle, index) => {
         const bgColor = index % 2 === 0 ? '#ffffff' : '#f0f0f0';
-        html += `<tr style="background-color: ${bgColor};"><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.plate_number}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.model}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.year}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.status}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.license_expiry}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${(vehicle.notes || '-').substring(0, 25)}</td></tr>`;
+        html += `<tr style="background-color: ${bgColor};"><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.plate_number}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.model}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.vin_number || '-'}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.year}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.status}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.license_expiry}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${(vehicle.notes || '-').substring(0, 25)}</td></tr>`;
     });
 
     html += `</tbody></table></div>`;
@@ -1193,16 +1194,17 @@ function generateVehiclesReportHTML() {
 
 function generateVehiclesReportExcel() {
     const data = [
-        ['تقرير المركبات', '', '', '', '', ''],
-        ['التاريخ: ' + new Date().toLocaleDateString('ar-EG'), '', '', '', '', ''],
+        ['تقرير المركبات', '', '', '', '', '', ''],
+        ['التاريخ: ' + new Date().toLocaleDateString('ar-EG'), '', '', '', '', '', ''],
         [],
-        ['اللوحة', 'النموذج', 'السنة', 'الحالة', 'انتهاء الرخصة', 'الملاحظات']
+        ['اللوحة', 'النموذج', 'اسم السائق', 'السنة', 'الحالة', 'انتهاء الرخصة', 'الملاحظات']
     ];
 
     appData.vehicles.forEach(vehicle => {
         data.push([
             vehicle.plate_number,
             vehicle.model,
+            vehicle.vin_number || '',
             vehicle.year,
             vehicle.status,
             vehicle.license_expiry,
