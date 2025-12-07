@@ -284,6 +284,21 @@ header {
     font-size: 14px;
 }
 
+.dashboard-vehicles-table .data-table th {
+    padding: 6px 10px;
+    font-size: 11px;
+}
+
+.dashboard-vehicles-table .data-table td {
+    padding: 4px 8px;
+    font-size: 10px;
+}
+
+.dashboard-vehicles-table .table-container {
+    max-height: calc(100vh - 400px);
+    overflow-y: auto;
+}
+
 .data-table tbody tr:hover {
     background-color: #f8f9fa;
 }
