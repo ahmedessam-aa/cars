@@ -150,6 +150,29 @@
                         <p class="empty-message">لا توجد تنبيهات</p>
                     </div>
                 </div>
+
+                <div class="card">
+                    <h3>🚗 آخر المركبات</h3>
+                    <div class="table-container dashboard-vehicles-table">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>اللوحة</th>
+                                    <th>نوع العربية</th>
+                                    <th>اسم السائق</th>
+                                    <th>الحالة</th>
+                                    <th>انتهاء الترخيص</th>
+                                    <th>الملاحظات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboardVehiclesTable">
+                                <tr class="empty-row">
+                                    <td colspan="6">لا توجد مركبات</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </section>
 
             <!-- إدارة المركبات -->
@@ -503,7 +526,7 @@
                         <input type="number" id="vehicleYear" required min="1990" max="2100">
                     </div>
                     <div class="form-group">
-                        <label>اسم السائق</label>
+                        <label>اسم السائق </label>
                         <input type="text" id="vinNumber" placeholder="رقم الهيكل الفريد">
                     </div>
                 </div>
@@ -511,10 +534,10 @@
                     <div class="form-group">
                         <label>الحالة الحالية *</label>
                         <select id="vehicleStatus" required>
-                                          <option value="نشطة">اخضر</option>
-                            <option value="في الصيانة">مطحون</option>
-                            <option value="معطوبة">نفل موظفين</option>
-                              <option value="في الصيانة">ملاكي</option>
+                            <option value="اخضر">اخضر</option>
+                            <option value="مطحون">مطحون</option>
+                            <option value="نقل موظفين">نقل موظفين</option>
+                            <option value="ملاكي">ملاكي</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -763,4 +786,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
