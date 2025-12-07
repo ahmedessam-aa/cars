@@ -857,6 +857,7 @@ function renderDashboard() {
     document.getElementById('pendingViolations').textContent = pendingViolations;
 
     renderAlerts();
+    displayDashboardVehicles();
 }
 
 function renderAlerts() {
@@ -904,6 +905,29 @@ function renderAlerts() {
 
 function populateVehiclesList() {
     filterVehicles();
+}
+
+function displayDashboardVehicles() {
+    const tbody = document.getElementById('dashboardVehiclesTable');
+    tbody.innerHTML = '';
+
+    if (appData.vehicles.length === 0) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="6">لا توجد مركبات</td></tr>';
+        return;
+    }
+
+    appData.vehicles.forEach(vehicle => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${vehicle.plate_number}</td>
+            <td>${vehicle.model}</td>
+            <td>${vehicle.vin_number || '-'}</td>
+            <td>${vehicle.status}</td>
+            <td>${vehicle.license_expiry}</td>
+            <td>${vehicle.notes || '-'}</td>
+        `;
+        tbody.appendChild(row);
+    });
 }
 
 function filterVehicles() {
@@ -1138,50 +1162,31 @@ function generateVehiclesReportPDF() {
 
 function generateVehiclesReportHTML() {
     let html = `
-        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px;">
-            <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px;">
-                <h1 style="margin: 0; font-size: 24px;">مصنع البهنساوي</h1>
-                <h2 style="margin: 5px 0; font-size: 18px;">تقرير المركبات</h2>
-                <p style="margin: 5px 0; font-size: 12px; color: #666;">
-                    التاريخ: ${new Date().toLocaleDateString('ar-EG')}
-                </p>
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 10px;">
+            <div style="text-align: center; margin-bottom: 10px; border-bottom: 2px solid #333; padding-bottom: 5px;">
+                <h1 style="margin: 0; font-size: 18px; color: #1a252f;">مصنع البهنساوي</h1>
+                <h2 style="margin: 5px 0; font-size: 14px; color: #34495e;">تقرير المركبات - ${new Date().toLocaleDateString('ar-EG')}</h2>
             </div>
-            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <table style="width: 100%; border-collapse: collapse; margin: 10px 0; line-height: 1.4;">
                 <thead>
-                    <tr style="background-color: #2c3e50; color: white;">
-                        <th style="padding: 12px; text-align: right; border: 1px solid #ddd;">اللوحة</th>
-                        <th style="padding: 12px; text-align: right; border: 1px solid #ddd;">النموذج</th>
-                        <th style="padding: 12px; text-align: right; border: 1px solid #ddd;">السنة</th>
-                        <th style="padding: 12px; text-align: right; border: 1px solid #ddd;">الحالة</th>
-                        <th style="padding: 12px; text-align: right; border: 1px solid #ddd;">انتهاء الرخصة</th>
-                        <th style="padding: 12px; text-align: right; border: 1px solid #ddd;">الملاحظات</th>
+                    <tr style="background-color: #1a252f; color: white;">
+                        <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">اللوحة</th>
+                        <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">النموذج</th>
+                        <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">السنة</th>
+                        <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">الحالة</th>
+                        <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">انتهاء الرخصة</th>
+                        <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">الملاحظات</th>
                     </tr>
                 </thead>
                 <tbody>
     `;
 
     appData.vehicles.forEach((vehicle, index) => {
-        const bgColor = index % 2 === 0 ? '#f9f9f9' : 'white';
-        html += `
-            <tr style="background-color: ${bgColor};">
-                <td style="padding: 10px; border: 1px solid #ddd;">${vehicle.plate_number}</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">${vehicle.model}</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">${vehicle.year}</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">${vehicle.status}</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">${vehicle.license_expiry}</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">${vehicle.notes || '-'}</td>
-            </tr>
-        `;
+        const bgColor = index % 2 === 0 ? '#ffffff' : '#f0f0f0';
+        html += `<tr style="background-color: ${bgColor};"><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.plate_number}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.model}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.year}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.status}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.license_expiry}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${(vehicle.notes || '-').substring(0, 25)}</td></tr>`;
     });
 
-    html += `
-                </tbody>
-            </table>
-            <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #ddd; text-align: center; font-size: 12px; color: #666;">
-                <p>تم إنشاء هذا التقرير بواسطة نظام إدارة المركبات - مصنع البهنساوي</p>
-            </div>
-        </div>
-    `;
+    html += `</tbody></table></div>`;
 
     return html;
 }
