@@ -813,7 +813,7 @@ function filterExpenses() {
             <td>${vehiclePlate}</td>
             <td>${expense.expense_type}</td>
             <td>${expense.expense_date}</td>
-            <td>${expense.amount.toLocaleString('ar-SA')} جنيه</td>
+            <td>${expense.amount.toLocaleString('en-US')} جنيه</td>
             <td>${expense.notes || '-'}</td>
             <td>
                 <div class="action-buttons">
@@ -1773,14 +1773,14 @@ function generateAdvanceExpensesReportHTML() {
 
             <div style="margin-bottom: 2px;">
                 <h3 style="margin: 0 0 4px 0; font-size: 14px; font-weight: bold; color: #2c3e50; border-bottom: 2px solid #2c3e50; padding-bottom: 2px;">تفاصيل المصروفات </h3>
-                <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
                     <thead>
                         <tr style="background-color: #2c3e50; color: white; font-weight: bold;">
-                            <th style="padding: 4px 4px; text-align: right; border: 1px solid #999;">اللوحة</th>
-                            <th style="padding: 4px 4px; text-align: right; border: 1px solid #999;">نوع المصروفات</th>
-                            <th style="padding: 4px 4px; text-align: right; border: 1px solid #999;">التاريخ</th>
-                            <th style="padding: 4px 4px; text-align: right; border: 1px solid #999;">المبلغ</th>
-                            <th style="padding: 4px 4px; text-align: right; border: 1px solid #999;">ملاحظات</th>
+                            <th style="padding: 8px 10px; text-align: right; border: 1px solid #999;">اللوحة</th>
+                            <th style="padding: 8px 10px; text-align: right; border: 1px solid #999;">نوع المصروفات</th>
+                            <th style="padding: 8px 10px; text-align: right; border: 1px solid #999;">التاريخ</th>
+                            <th style="padding: 8px 10px; text-align: right; border: 1px solid #999;">المبلغ</th>
+                            <th style="padding: 8px 10px; text-align: right; border: 1px solid #999;">ملاحظات</th>
                         </tr>
                     </thead>
                     <tbody>
