@@ -1724,22 +1724,22 @@ function generateAdvanceExpensesReportHTML() {
         
         expensesTable += `
             <tr style="background-color: ${bgColor};">
-                <td style="padding: 4px 5px; border: 1px solid #ccc;">${vehiclePlate}</td>
-                <td style="padding: 4px 5px; border: 1px solid #ccc;">${expense.expense_type}</td>
-                <td style="padding: 4px 5px; border: 1px solid #ccc;">${expense.expense_date}</td>
-                <td style="padding: 4px 5px; border: 1px solid #ccc; text-align: center; font-weight: 500;">${expense.amount.toLocaleString('ar-SA')}</td>
-                <td style="padding: 4px 5px; border: 1px solid #ccc;">${expense.notes || '-'}</td>
+                <td style="padding: 6px 8px; border: 1px solid #ccc;">${vehiclePlate}</td>
+                <td style="padding: 6px 8px; border: 1px solid #ccc;">${expense.expense_type}</td>
+                <td style="padding: 6px 8px; border: 1px solid #ccc;">${expense.expense_date}</td>
+                <td style="padding: 6px 8px; border: 1px solid #ccc; text-align: center; font-weight: 500;">${expense.amount.toLocaleString('en-US')}</td>
+                <td style="padding: 6px 8px; border: 1px solid #ccc;">${expense.notes || '-'}</td>
             </tr>
         `;
     });
     
     expensesTable += `
-        <tr style="background-color: #2c3e50; color: white; font-weight: bold; font-size: 10px;">
-            <td style="padding: 4px 5px; border: 1px solid #999;"></td>
-            <td style="padding: 4px 5px; border: 1px solid #999;"></td>
-            <td style="padding: 4px 5px; border: 1px solid #999; text-align: right;">الإجمالي:</td>
-            <td style="padding: 4px 5px; border: 1px solid #999; text-align: center; font-weight: bold;">${usedAdvance.toLocaleString('ar-SA')}</td>
-            <td style="padding: 4px 5px; border: 1px solid #999;"></td>
+        <tr style="background-color: #2c3e50; color: white; font-weight: bold; font-size: 12px;">
+            <td style="padding: 6px 8px; border: 1px solid #999;"></td>
+            <td style="padding: 6px 8px; border: 1px solid #999;"></td>
+            <td style="padding: 6px 8px; border: 1px solid #999; text-align: right;">الإجمالي:</td>
+            <td style="padding: 6px 8px; border: 1px solid #999; text-align: center; font-weight: bold;">${usedAdvance.toLocaleString('en-US')}</td>
+            <td style="padding: 6px 8px; border: 1px solid #999;"></td>
         </tr>
     `;
 
@@ -1747,37 +1747,37 @@ function generateAdvanceExpensesReportHTML() {
         <div dir="rtl" style="font-family: Arial, sans-serif; padding: 10px; line-height: 1.4;">
             <div style="text-align: center; margin-bottom: 10px; border-bottom: 3px solid #2c3e50; padding-bottom: 8px;">
                 <h1 style="margin: 0; font-size: 24px; font-weight: bold;">مصنع البهنساوي</h1>
-                <h2 style="margin: 2px 0; font-size: 15px; font-weight: bold;">تقرير النفقات والعهدة</h2>
+                <h2 style="margin: 2px 0; font-size: 15px; font-weight: bold;">تقرير المصروفات والعهدة</h2>
                 <p style="margin: 2px 0; font-size: 10px; color: #666;">
                     التاريخ: ${new Date().toLocaleDateString('ar-EG')}
                 </p>
             </div>
 
             <div style="margin-bottom: 8px; background-color: #f5f5f5; padding: 6px; border-radius: 3px; border-left: 4px solid #2c3e50;">
-                <h3 style="margin: 0 0 5px 0; font-size: 14px; font-weight: bold; color: #2c3e50;">ملخص العهدة والنفقات</h3>
-                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <h3 style="margin: 0 0 5px 0; font-size: 14px; font-weight: bold; color: #2c3e50;">ملخص العهدة والمصروفات </h3>
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                     <tr>
-                        <td style="padding: 4px 5px; border: 1px solid #bbb; background-color: #e8f4f8; font-weight: bold; width: 50%;">العهدة المتاحة:</td>
-                        <td style="padding: 4px 5px; border: 1px solid #bbb; text-align: center; font-weight: bold; font-size: 12px;">${totalAdvance.toLocaleString('ar-SA')}</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbb; background-color: #e8f4f8; font-weight: bold; width: 50%;">العهدة المتاحة:</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbb; text-align: center; font-weight: bold; font-size: 14px;">${totalAdvance.toLocaleString('en-US')}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 4px 5px; border: 1px solid #bbb; background-color: #fff3cd; font-weight: bold;">المصروف:</td>
-                        <td style="padding: 4px 5px; border: 1px solid #bbb; text-align: center; font-weight: bold; color: #c00; font-size: 12px;">${usedAdvance.toLocaleString('ar-SA')}</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbb; background-color: #fff3cd; font-weight: bold;">المصروف:</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbb; text-align: center; font-weight: bold; color: #c00; font-size: 14px;">${usedAdvance.toLocaleString('en-US')}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 4px 5px; border: 1px solid #bbb; background-color: #d4edda; font-weight: bold;">المتبقي:</td>
-                        <td style="padding: 4px 5px; border: 1px solid #bbb; text-align: center; font-weight: bold; color: #060; font-size: 12px;">${remainingAdvance.toLocaleString('ar-SA')}</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbb; background-color: #d4edda; font-weight: bold;">المتبقي:</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbb; text-align: center; font-weight: bold; color: #060; font-size: 14px;">${remainingAdvance.toLocaleString('en-US')}</td>
                     </tr>
                 </table>
             </div>
 
             <div style="margin-bottom: 2px;">
-                <h3 style="margin: 0 0 4px 0; font-size: 14px; font-weight: bold; color: #2c3e50; border-bottom: 2px solid #2c3e50; padding-bottom: 2px;">تفاصيل النفقات</h3>
+                <h3 style="margin: 0 0 4px 0; font-size: 14px; font-weight: bold; color: #2c3e50; border-bottom: 2px solid #2c3e50; padding-bottom: 2px;">تفاصيل المصروفات </h3>
                 <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
                     <thead>
                         <tr style="background-color: #2c3e50; color: white; font-weight: bold;">
                             <th style="padding: 4px 4px; text-align: right; border: 1px solid #999;">اللوحة</th>
-                            <th style="padding: 4px 4px; text-align: right; border: 1px solid #999;">نوع النفقة</th>
+                            <th style="padding: 4px 4px; text-align: right; border: 1px solid #999;">نوع المصروفات</th>
                             <th style="padding: 4px 4px; text-align: right; border: 1px solid #999;">التاريخ</th>
                             <th style="padding: 4px 4px; text-align: right; border: 1px solid #999;">المبلغ</th>
                             <th style="padding: 4px 4px; text-align: right; border: 1px solid #999;">ملاحظات</th>
@@ -1789,15 +1789,15 @@ function generateAdvanceExpensesReportHTML() {
                 </table>
             </div>
 
-            <div style="margin-top: 6px; padding: 5px 0; border-top: 2px solid #333;">
+            <div style="margin-top: 8px; padding: 7px 0; border-top: 2px solid #333;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                     <div style="text-align: center; width: 45%;">
-                        <p style="margin: 0 0 16px 0; font-size: 10px;">التوقيع</p>
-                        <p style="margin: 0; font-size: 10px; font-weight: bold; border-top: 2px solid #333; padding-top: 3px;">مدير الحركة</p>
+                        <p style="margin: 0 0 16px 0; font-size: 12px;">التوقيع</p>
+                        <p style="margin: 0; font-size: 12px; font-weight: bold; border-top: 2px solid #333; padding-top: 4px;">مدير الحركة</p>
                     </div>
                     <div style="text-align: center; width: 45%;">
-                        <p style="margin: 0 0 16px 0; font-size: 10px;">التوقيع</p>
-                        <p style="margin: 0; font-size: 10px; font-weight: bold; border-top: 2px solid #333; padding-top: 3px;">المدير المالي</p>
+                        <p style="margin: 0 0 16px 0; font-size: 12px;">التوقيع</p>
+                        <p style="margin: 0; font-size: 12px; font-weight: bold; border-top: 2px solid #333; padding-top: 4px;">المدير المالي</p>
                     </div>
                 </div>
             </div>
