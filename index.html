@@ -434,11 +434,11 @@
 
                     <div class="card report-card">
                         <h3>💰 تقرير المصروفات</h3>
-                        <p>ملخص تكاليف الصيانة حسب الفترة الزمنية</p>
+                        <p>تقرير شامل لجميع المصروفات والنفقات</p>
                         <div class="report-buttons">
-                            <button class="btn btn-small btn-primary" onclick="generateExpensesReportPDF()">PDF</button>
+                            <button class="btn btn-small btn-primary" onclick="openExpensesFilterModal()">⚙️ فلتر</button>
+                            <button class="btn btn-small btn-info" onclick="generateExpensesReportPDF()">PDF</button>
                             <button class="btn btn-small btn-success" onclick="generateExpensesReportExcel()">Excel</button>
-                            <button class="btn btn-small btn-info" onclick="printExpensesReport()">طباعة</button>
                         </div>
                     </div>
 
@@ -778,6 +778,41 @@
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">حفظ</button>
                     <button type="button" class="btn btn-secondary" onclick="closeAdvanceModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نموذج فلتر تقرير المصروفات -->
+    <div id="expensesFilterModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeExpensesFilterModal()">&times;</span>
+            <h2>فلترة تقرير المصروفات</h2>
+            <form id="expensesFilterForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>من التاريخ</label>
+                        <input type="date" id="expensesFromDate">
+                    </div>
+                    <div class="form-group">
+                        <label>إلى التاريخ</label>
+                        <input type="date" id="expensesToDate">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>من المبلغ (جنيه)</label>
+                        <input type="number" id="expensesFromAmount" min="0" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>إلى المبلغ (جنيه)</label>
+                        <input type="number" id="expensesToAmount" min="0" placeholder="0">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" onclick="generateFilteredExpensesReportPDF()">عرض PDF</button>
+                    <button type="button" class="btn btn-success" onclick="generateFilteredExpensesReportExcel()">عرض Excel</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeExpensesFilterModal()">إغلاق</button>
                 </div>
             </form>
         </div>
