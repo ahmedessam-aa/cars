@@ -1162,21 +1162,21 @@ function generateVehiclesReportPDF() {
 
 function generateVehiclesReportHTML() {
     let html = `
-        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 10px;">
-            <div style="text-align: center; margin-bottom: 10px; border-bottom: 2px solid #333; padding-bottom: 5px;">
-                <h1 style="margin: 0; font-size: 18px; color: #1a252f;">مصنع البهنساوي</h1>
-                <h2 style="margin: 5px 0; font-size: 14px; color: #34495e;">تقرير المركبات - ${new Date().toLocaleDateString('ar-EG')}</h2>
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 4px; margin: 0;">
+            <div style="text-align: center; margin-bottom: 4px; border-bottom: 1px solid #333; padding-bottom: 3px;">
+                <h1 style="margin: 0; font-size: 14px; color: #1a252f; font-weight: bold;">مصنع البهنساوي</h1>
+                <h2 style="margin: 2px 0 0 0; font-size: 10px; color: #34495e;">تقرير المركبات - ${new Date().toLocaleDateString('ar-EG')}</h2>
             </div>
-            <table style="width: 100%; border-collapse: collapse; margin: 10px 0; line-height: 1.4;">
+            <table style="width: 100%; border-collapse: collapse; margin: 2px 0; line-height: 1.2;">
                 <thead>
-                    <tr style="background-color: #1a252f; color: white;">
-                        <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">اللوحة</th>
-                        <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">النموذج</th>
-                        <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">اسم السائق</th>
-                        <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">السنة</th>
-                        <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">الحالة</th>
-                        <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">انتهاء الرخصة</th>
-                        <th style="padding: 8px 10px; text-align: right; border: 1px solid #666; font-size: 12px; white-space: nowrap;">الملاحظات</th>
+                    <tr style="background-color: #1a252f; color: white; height: 13px;">
+                        <th style="padding: 2px 4px; text-align: right; border: 1px solid #666; font-size: 9px; font-weight: bold;">اللوحة</th>
+                        <th style="padding: 2px 4px; text-align: right; border: 1px solid #666; font-size: 9px; font-weight: bold;">النموذج</th>
+                        <th style="padding: 2px 4px; text-align: right; border: 1px solid #666; font-size: 9px; font-weight: bold;">السائق</th>
+                        <th style="padding: 2px 4px; text-align: right; border: 1px solid #666; font-size: 9px; font-weight: bold;">السنة</th>
+                        <th style="padding: 2px 4px; text-align: right; border: 1px solid #666; font-size: 9px; font-weight: bold;">الحالة</th>
+                        <th style="padding: 2px 4px; text-align: right; border: 1px solid #666; font-size: 9px; font-weight: bold;">انتهاء الرخصة</th>
+                        <th style="padding: 2px 4px; text-align: right; border: 1px solid #666; font-size: 9px; font-weight: bold;">ملاحظات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1184,7 +1184,8 @@ function generateVehiclesReportHTML() {
 
     appData.vehicles.forEach((vehicle, index) => {
         const bgColor = index % 2 === 0 ? '#ffffff' : '#f0f0f0';
-        html += `<tr style="background-color: ${bgColor};"><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.plate_number}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.model}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.vin_number || '-'}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.year}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.status}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${vehicle.license_expiry}</td><td style="padding: 6px 8px; border: 1px solid #ccc; font-size: 11px;">${(vehicle.notes || '-').substring(0, 25)}</td></tr>`;
+        const statusColor = vehicle.status === 'اخضر' ? '#27ae60' : vehicle.status === 'مطحون' ? '#e74c3c' : vehicle.status === 'نقل موظفين' ? '#f39c12' : '#3498db';
+        html += `<tr style="background-color: ${bgColor}; height: 12px;"><td style="padding: 2px 3px; border: 0.5px solid #ccc; font-size: 9px; font-weight: bold;">${vehicle.plate_number}</td><td style="padding: 2px 3px; border: 0.5px solid #ccc; font-size: 9px;">${vehicle.model}</td><td style="padding: 2px 3px; border: 0.5px solid #ccc; font-size: 8px;">${vehicle.vin_number || '-'}</td><td style="padding: 2px 3px; border: 0.5px solid #ccc; font-size: 9px;">${vehicle.year}</td><td style="padding: 2px 3px; border: 0.5px solid #ccc; font-size: 9px; color: white; background-color: ${statusColor}; font-weight: bold; text-align: center;">${vehicle.status}</td><td style="padding: 2px 3px; border: 0.5px solid #ccc; font-size: 9px;">${vehicle.license_expiry}</td><td style="padding: 2px 3px; border: 0.5px solid #ccc; font-size: 8px;">${(vehicle.notes || '-').substring(0, 15)}</td></tr>`;
     });
 
     html += `</tbody></table></div>`;
@@ -1344,75 +1345,179 @@ function generateExpensesReportPDF() {
 }
 
 function generateExpensesReportHTML() {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
+    let html = `
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 8px; margin: 0;">
+            <div style="text-align: center; margin-bottom: 8px; border-bottom: 2px solid #1a252f; padding-bottom: 6px;">
+                <h1 style="margin: 0; font-size: 16px; color: #1a252f; font-weight: bold;">مصنع البهنساوي</h1>
+                <h2 style="margin: 3px 0 0 0; font-size: 12px; color: #34495e;">تقرير المصروفات والعهدة الشامل</h2>
+                <p style="margin: 2px 0; font-size: 9px; color: #666;">التاريخ: ${new Date().toLocaleDateString('ar-EG')}</p>
+            </div>
+    `;
 
-    const monthlyData = {};
-    for (let i = 0; i < 12; i++) {
-        monthlyData[i] = 0;
-    }
+    let totalMaintenance = 0;
+    let totalViolations = 0;
+    let totalExpenses = 0;
+    let totalAdvance = 0;
 
+    // مصاريف الصيانة
     appData.maintenance.forEach(m => {
-        const mDate = new Date(m.maintenance_date);
-        if (mDate.getFullYear() === currentYear) {
-            monthlyData[mDate.getMonth()] += m.cost;
+        totalMaintenance += m.cost;
+    });
+
+    // مصاريف المخالفات
+    appData.violations.forEach(v => {
+        if (v.status === 'مسددة') {
+            totalViolations += v.amount;
         }
     });
 
-    const monthNames = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-                       'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-
-    let html = `
-        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px;">
-            <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px;">
-                <h1 style="margin: 0; font-size: 24px;">مصنع البهنساوي</h1>
-                <h2 style="margin: 5px 0; font-size: 18px;">تقرير المصروفات السنوي</h2>
-                <p style="margin: 5px 0; font-size: 12px; color: #666;">
-                    السنة: ${currentYear} | التاريخ: ${new Date().toLocaleDateString('ar-EG')}
-                </p>
-            </div>
-            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-                <thead>
-                    <tr style="background-color: #2c3e50; color: white;">
-                        <th style="padding: 12px; text-align: right; border: 1px solid #ddd;">الشهر</th>
-                        <th style="padding: 12px; text-align: right; border: 1px solid #ddd;">المصروفات (جنيه)</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
-
-    let totalExpenses = 0;
-    monthNames.forEach((month, index) => {
-        const expense = monthlyData[index];
-        totalExpenses += expense;
-        const bgColor = index % 2 === 0 ? '#f9f9f9' : 'white';
-        html += `
-            <tr style="background-color: ${bgColor};">
-                <td style="padding: 10px; border: 1px solid #ddd;">${month}</td>
-                <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${expense.toLocaleString('ar-SA')}</td>
-            </tr>
-        `;
+    // مصاريف النفقات
+    appData.expenses.forEach(e => {
+        totalExpenses += e.amount;
     });
 
+    // مصاريف العهدة
+    appData.advance.forEach(a => {
+        totalAdvance += a.amount;
+    });
+
+    const expensesGrandTotal = totalMaintenance + totalViolations + totalExpenses;
+
+    // جدول مصاريف الصيانة
+    if (appData.maintenance.length > 0) {
+        html += `
+            <div style="margin-top: 8px;">
+                <h3 style="margin: 4px 0 2px 0; font-size: 11px; color: white; background-color: #34495e; padding: 3px 6px; font-weight: bold;">🔧 مصاريف الصيانة والتصليح</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 2px 0; font-size: 10px;">
+                    <thead>
+                        <tr style="background-color: #5d6d7b; color: white; height: 13px;">
+                            <th style="padding: 2px 3px; border: 1px solid #666; text-align: right; font-weight: bold;">اللوحة</th>
+                            <th style="padding: 2px 3px; border: 1px solid #666; text-align: right; font-weight: bold;">نوع الصيانة</th>
+                            <th style="padding: 2px 3px; border: 1px solid #666; text-align: right; font-weight: bold;">التاريخ</th>
+                            <th style="padding: 2px 3px; border: 1px solid #666; text-align: center; font-weight: bold;">المبلغ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        appData.maintenance.forEach((m, idx) => {
+            const bgColor = idx % 2 === 0 ? '#fafafa' : '#ffffff';
+            html += `<tr style="background-color: ${bgColor}; height: 12px;"><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 10px; font-weight: bold;">${m.plate_number || '-'}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 9px;">${m.maintenance_type}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 9px;">${m.maintenance_date}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; text-align: center; font-weight: bold; font-size: 10px;">${m.cost.toLocaleString('ar-SA')}</td></tr>`;
+        });
+
+        html += `
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color: #d4edda; font-weight: bold; height: 13px;">
+                            <td colspan="3" style="padding: 2px 3px; border: 1px solid #999; text-align: right; font-size: 10px;">إجمالي</td>
+                            <td style="padding: 2px 3px; border: 1px solid #999; text-align: center; color: #27ae60; font-size: 11px;">${totalMaintenance.toLocaleString('ar-SA')}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        `;
+    }
+
+    // جدول مصاريف المخالفات المسددة
+    const paidViolations = appData.violations.filter(v => v.status === 'مسددة');
+    if (paidViolations.length > 0) {
+        html += `
+            <div style="margin-top: 8px;">
+                <h3 style="margin: 4px 0 2px 0; font-size: 11px; color: white; background-color: #e74c3c; padding: 3px 6px; font-weight: bold;">⚠️ مصاريف المخالفات المسددة</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 2px 0; font-size: 10px;">
+                    <thead>
+                        <tr style="background-color: #f1948b; color: white; height: 13px;">
+                            <th style="padding: 2px 3px; border: 1px solid #666; text-align: right; font-weight: bold;">اللوحة</th>
+                            <th style="padding: 2px 3px; border: 1px solid #666; text-align: right; font-weight: bold;">نوع المخالفة</th>
+                            <th style="padding: 2px 3px; border: 1px solid #666; text-align: right; font-weight: bold;">التاريخ</th>
+                            <th style="padding: 2px 3px; border: 1px solid #666; text-align: center; font-weight: bold;">المبلغ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        paidViolations.forEach((v, idx) => {
+            const bgColor = idx % 2 === 0 ? '#fafafa' : '#ffffff';
+            html += `<tr style="background-color: ${bgColor}; height: 12px;"><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 10px; font-weight: bold;">${v.plate_number || '-'}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 9px;">${v.violation_type}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 9px;">${v.violation_date}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; text-align: center; font-weight: bold; font-size: 10px;">${v.amount.toLocaleString('ar-SA')}</td></tr>`;
+        });
+
+        html += `
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color: #ffebee; font-weight: bold; height: 13px;">
+                            <td colspan="3" style="padding: 2px 3px; border: 1px solid #999; text-align: right; font-size: 10px;">إجمالي</td>
+                            <td style="padding: 2px 3px; border: 1px solid #999; text-align: center; color: #e74c3c; font-size: 11px;">${totalViolations.toLocaleString('ar-SA')}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        `;
+    }
+
+    // جدول مصاريف النفقات
+    if (appData.expenses.length > 0) {
+        html += `
+            <div style="margin-top: 8px;">
+                <h3 style="margin: 4px 0 2px 0; font-size: 11px; color: white; background-color: #f39c12; padding: 3px 6px; font-weight: bold;">💰 مصاريف النفقات</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 2px 0; font-size: 10px;">
+                    <thead>
+                        <tr style="background-color: #f5b041; color: white; height: 13px;">
+                            <th style="padding: 2px 3px; border: 1px solid #666; text-align: right; font-weight: bold;">اللوحة</th>
+                            <th style="padding: 2px 3px; border: 1px solid #666; text-align: right; font-weight: bold;">نوع النفقة</th>
+                            <th style="padding: 2px 3px; border: 1px solid #666; text-align: right; font-weight: bold;">التاريخ</th>
+                            <th style="padding: 2px 3px; border: 1px solid #666; text-align: center; font-weight: bold;">المبلغ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        appData.expenses.forEach((e, idx) => {
+            const bgColor = idx % 2 === 0 ? '#fafafa' : '#ffffff';
+            html += `<tr style="background-color: ${bgColor}; height: 12px;"><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 10px; font-weight: bold;">${e.plate_number || '-'}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 9px;">${e.expense_type}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 9px;">${e.expense_date}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; text-align: center; font-weight: bold; font-size: 10px;">${e.amount.toLocaleString('ar-SA')}</td></tr>`;
+        });
+
+        html += `
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color: #fffbea; font-weight: bold; height: 13px;">
+                            <td colspan="3" style="padding: 2px 3px; border: 1px solid #999; text-align: right; font-size: 10px;">إجمالي</td>
+                            <td style="padding: 2px 3px; border: 1px solid #999; text-align: center; color: #f39c12; font-size: 11px;">${totalExpenses.toLocaleString('ar-SA')}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        `;
+    }
+
+
+
+    // الإجمالي العام للمصروفات (بدون العهدة)
     html += `
-                </tbody>
-                <tfoot>
-                    <tr style="background-color: #2c3e50; color: white; font-weight: bold;">
-                        <td style="padding: 12px; border: 1px solid #ddd;">الإجمالي السنوي</td>
-                        <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${totalExpenses.toLocaleString('ar-SA')}</td>
-                    </tr>
-                </tfoot>
+        <div style="margin-top: 10px; padding: 8px; background-color: #27ae60; color: white; border-radius: 2px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <tr style="height: 13px;">
+                    <td style="padding: 3px 4px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.3);">🔧 مصاريف الصيانة</td>
+                    <td style="padding: 3px 4px; text-align: center; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.3);">${totalMaintenance.toLocaleString('ar-SA')}</td>
+                </tr>
+                <tr style="height: 13px;">
+                    <td style="padding: 3px 4px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.3);">⚠️ مصاريف المخالفات المسددة</td>
+                    <td style="padding: 3px 4px; text-align: center; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.3);">${totalViolations.toLocaleString('ar-SA')}</td>
+                </tr>
+                <tr style="height: 13px;">
+                    <td style="padding: 3px 4px; text-align: right; border-bottom: 2px solid white;">💰 مصاريف النفقات</td>
+                    <td style="padding: 3px 4px; text-align: center; font-weight: bold; border-bottom: 2px solid white;">${totalExpenses.toLocaleString('ar-SA')}</td>
+                </tr>
+                <tr style="height: 15px;">
+                    <td style="padding: 4px; font-size: 12px; text-align: right; font-weight: bold;">💵 إجمالي المصروفات</td>
+                    <td style="padding: 4px; font-size: 13px; text-align: center; font-weight: bold; color: #fff000;">${expensesGrandTotal.toLocaleString('ar-SA')} جنيه</td>
+                </tr>
             </table>
-            <div style="margin-top: 20px; padding: 15px; background-color: #ecf0f1; border-radius: 5px;">
-                <p style="margin: 0; font-size: 14px;"><strong>الإجمالي العام للمصروفات:</strong> ${totalExpenses.toLocaleString('ar-SA')} جنيه</p>
-                <p style="margin: 5px 0; font-size: 14px;"><strong>متوسط المصروفات الشهرية:</strong> ${(totalExpenses / 12).toLocaleString('ar-SA')} جنيه</p>
-            </div>
-            <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #ddd; text-align: center; font-size: 12px; color: #666;">
-                <p>تم إنشاء هذا التقرير بواسطة نظام إدارة المركبات - مصنع البهنساوي</p>
-            </div>
         </div>
     `;
+
+
+
+    html += `</div>`;
 
     return html;
 }
@@ -1923,6 +2028,260 @@ function printViolationsReport() {
 
 function printPage() {
     window.print();
+}
+
+function openExpensesFilterModal() {
+    document.getElementById('expensesFilterModal').classList.add('show');
+}
+
+function closeExpensesFilterModal() {
+    document.getElementById('expensesFilterModal').classList.remove('show');
+}
+
+function getFilteredExpensesData() {
+    const fromDate = document.getElementById('expensesFromDate').value;
+    const toDate = document.getElementById('expensesToDate').value;
+    const fromAmount = parseFloat(document.getElementById('expensesFromAmount').value) || 0;
+    const toAmount = parseFloat(document.getElementById('expensesToAmount').value) || Infinity;
+
+    let filteredMaintenance = appData.maintenance;
+    let filteredViolations = appData.violations.filter(v => v.status === 'مسددة');
+    let filteredExpenses = appData.expenses;
+    let filteredAdvance = appData.advance;
+
+    if (fromDate) {
+        filteredMaintenance = filteredMaintenance.filter(m => new Date(m.maintenance_date) >= new Date(fromDate));
+        filteredViolations = filteredViolations.filter(v => new Date(v.violation_date) >= new Date(fromDate));
+        filteredExpenses = filteredExpenses.filter(e => new Date(e.expense_date) >= new Date(fromDate));
+        filteredAdvance = filteredAdvance.filter(a => new Date(a.advance_date) >= new Date(fromDate));
+    }
+
+    if (toDate) {
+        filteredMaintenance = filteredMaintenance.filter(m => new Date(m.maintenance_date) <= new Date(toDate));
+        filteredViolations = filteredViolations.filter(v => new Date(v.violation_date) <= new Date(toDate));
+        filteredExpenses = filteredExpenses.filter(e => new Date(e.expense_date) <= new Date(toDate));
+        filteredAdvance = filteredAdvance.filter(a => new Date(a.advance_date) <= new Date(toDate));
+    }
+
+    if (fromAmount > 0 || toAmount !== Infinity) {
+        filteredMaintenance = filteredMaintenance.filter(m => m.cost >= fromAmount && m.cost <= toAmount);
+        filteredViolations = filteredViolations.filter(v => v.amount >= fromAmount && v.amount <= toAmount);
+        filteredExpenses = filteredExpenses.filter(e => e.amount >= fromAmount && e.amount <= toAmount);
+        filteredAdvance = filteredAdvance.filter(a => a.amount >= fromAmount && a.amount <= toAmount);
+    }
+
+    return { filteredMaintenance, filteredViolations, filteredExpenses, filteredAdvance };
+}
+
+function generateFilteredExpensesReportPDF() {
+    const html = generateFilteredExpensesReportHTML();
+    const element = document.createElement('div');
+    element.innerHTML = html;
+
+    const options = {
+        margin: 10,
+        filename: 'تقرير_المصروفات_مصفاة.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+    };
+
+    html2pdf().set(options).from(element).save();
+    closeExpensesFilterModal();
+}
+
+function generateFilteredExpensesReportHTML() {
+    const { filteredMaintenance, filteredViolations, filteredExpenses, filteredAdvance } = getFilteredExpensesData();
+    
+    let html = `
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 10px; margin: 0;">
+            <div style="text-align: center; margin-bottom: 12px; border-bottom: 2px solid #333; padding-bottom: 8px;">
+                <h1 style="margin: 0; font-size: 18px; color: #1a252f; font-weight: bold;">مصنع البهنساوي</h1>
+                <h2 style="margin: 4px 0 0 0; font-size: 13px; color: #34495e;">تقرير المصروفات (مصفاة)</h2>
+                <p style="margin: 3px 0; font-size: 10px; color: #666;">التاريخ: ${new Date().toLocaleDateString('ar-EG')}</p>
+            </div>
+    `;
+
+    let totalMaintenance = 0;
+    let totalViolations = 0;
+    let totalExpenses = 0;
+    let totalAdvance = 0;
+
+    filteredMaintenance.forEach(m => { totalMaintenance += m.cost; });
+    filteredViolations.forEach(v => { totalViolations += v.amount; });
+    filteredExpenses.forEach(e => { totalExpenses += e.amount; });
+    filteredAdvance.forEach(a => { totalAdvance += a.amount; });
+
+    const grandTotal = totalMaintenance + totalViolations + totalExpenses;
+
+    if (filteredMaintenance.length > 0) {
+        html += `
+            <div style="margin-top: 8px;">
+                <h3 style="margin: 5px 0; font-size: 12px; color: white; background-color: #34495e; padding: 4px 8px; font-weight: bold;">🔧 مصاريف الصيانة والتصليح</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 4px 0; font-size: 10px;">
+                    <thead>
+                        <tr style="background-color: #5d6d7b; color: white; height: 12px;">
+                            <th style="padding: 3px 4px; border: 0.5px solid #999; text-align: right;">اللوحة</th>
+                            <th style="padding: 3px 4px; border: 0.5px solid #999; text-align: right;">نوع الصيانة</th>
+                            <th style="padding: 3px 4px; border: 0.5px solid #999; text-align: right;">التاريخ</th>
+                            <th style="padding: 3px 4px; border: 0.5px solid #999; text-align: center;">المبلغ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        filteredMaintenance.forEach((m, idx) => {
+            const bgColor = idx % 2 === 0 ? '#ffffff' : '#f5f5f5';
+            html += `<tr style="background-color: ${bgColor}; height: 11px;"><td style="padding: 2px 3px; border: 0.5px solid #ddd;">${m.plate_number || '-'}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 9px;">${m.maintenance_type}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 9px;">${m.maintenance_date}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; text-align: center; font-weight: bold;">${m.cost.toLocaleString('ar-SA')}</td></tr>`;
+        });
+
+        html += `
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color: #ecf0f1; font-weight: bold; height: 12px;">
+                            <td colspan="3" style="padding: 3px 4px; border: 0.5px solid #999; text-align: right;">الإجمالي</td>
+                            <td style="padding: 3px 4px; border: 0.5px solid #999; text-align: center; color: #27ae60;">${totalMaintenance.toLocaleString('ar-SA')}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        `;
+    }
+
+    if (filteredViolations.length > 0) {
+        html += `
+            <div style="margin-top: 8px;">
+                <h3 style="margin: 5px 0; font-size: 12px; color: white; background-color: #e74c3c; padding: 4px 8px; font-weight: bold;">⚠️ مصاريف المخالفات</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 4px 0; font-size: 10px;">
+                    <thead>
+                        <tr style="background-color: #f1948b; color: white; height: 12px;">
+                            <th style="padding: 3px 4px; border: 0.5px solid #999; text-align: right;">اللوحة</th>
+                            <th style="padding: 3px 4px; border: 0.5px solid #999; text-align: right;">نوع المخالفة</th>
+                            <th style="padding: 3px 4px; border: 0.5px solid #999; text-align: right;">التاريخ</th>
+                            <th style="padding: 3px 4px; border: 0.5px solid #999; text-align: center;">المبلغ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        filteredViolations.forEach((v, idx) => {
+            const bgColor = idx % 2 === 0 ? '#ffffff' : '#f5f5f5';
+            html += `<tr style="background-color: ${bgColor}; height: 11px;"><td style="padding: 2px 3px; border: 0.5px solid #ddd;">${v.plate_number || '-'}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 9px;">${v.violation_type}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 9px;">${v.violation_date}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; text-align: center; font-weight: bold;">${v.amount.toLocaleString('ar-SA')}</td></tr>`;
+        });
+
+        html += `
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color: #ecf0f1; font-weight: bold; height: 12px;">
+                            <td colspan="3" style="padding: 3px 4px; border: 0.5px solid #999; text-align: right;">الإجمالي</td>
+                            <td style="padding: 3px 4px; border: 0.5px solid #999; text-align: center; color: #e74c3c;">${totalViolations.toLocaleString('ar-SA')}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        `;
+    }
+
+    if (filteredExpenses.length > 0) {
+        html += `
+            <div style="margin-top: 8px;">
+                <h3 style="margin: 5px 0; font-size: 12px; color: white; background-color: #f39c12; padding: 4px 8px; font-weight: bold;">💰 مصاريف النفقات</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 4px 0; font-size: 10px;">
+                    <thead>
+                        <tr style="background-color: #f5b041; color: white; height: 12px;">
+                            <th style="padding: 3px 4px; border: 0.5px solid #999; text-align: right;">اللوحة</th>
+                            <th style="padding: 3px 4px; border: 0.5px solid #999; text-align: right;">نوع النفقة</th>
+                            <th style="padding: 3px 4px; border: 0.5px solid #999; text-align: right;">التاريخ</th>
+                            <th style="padding: 3px 4px; border: 0.5px solid #999; text-align: center;">المبلغ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        filteredExpenses.forEach((e, idx) => {
+            const bgColor = idx % 2 === 0 ? '#ffffff' : '#f5f5f5';
+            html += `<tr style="background-color: ${bgColor}; height: 11px;"><td style="padding: 2px 3px; border: 0.5px solid #ddd;">${e.plate_number || '-'}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 9px;">${e.expense_type}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; font-size: 9px;">${e.expense_date}</td><td style="padding: 2px 3px; border: 0.5px solid #ddd; text-align: center; font-weight: bold;">${e.amount.toLocaleString('ar-SA')}</td></tr>`;
+        });
+
+        html += `
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color: #ecf0f1; font-weight: bold; height: 12px;">
+                            <td colspan="3" style="padding: 3px 4px; border: 0.5px solid #999; text-align: right;">الإجمالي</td>
+                            <td style="padding: 3px 4px; border: 0.5px solid #999; text-align: center; color: #f39c12;">${totalExpenses.toLocaleString('ar-SA')}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        `;
+    }
+
+
+
+    html += `
+        <div style="margin-top: 12px; padding: 10px; background-color: #1a252f; color: white; border-radius: 3px;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="height: 14px;"><td style="padding: 4px; font-size: 11px; text-align: right;">إجمالي الصيانة:</td><td style="padding: 4px; font-size: 11px; font-weight: bold; text-align: center;">${totalMaintenance.toLocaleString('ar-SA')}</td></tr>
+                <tr style="height: 14px; background-color: rgba(255,255,255,0.1);"><td style="padding: 4px; font-size: 11px; text-align: right;">إجمالي المخالفات:</td><td style="padding: 4px; font-size: 11px; font-weight: bold; text-align: center;">${totalViolations.toLocaleString('ar-SA')}</td></tr>
+                <tr style="height: 14px;"><td style="padding: 4px; font-size: 11px; text-align: right;">إجمالي النفقات:</td><td style="padding: 4px; font-size: 11px; font-weight: bold; text-align: center;">${totalExpenses.toLocaleString('ar-SA')}</td></tr>
+                <tr style="height: 16px; border-top: 2px solid white;"><td style="padding: 5px; font-size: 12px; font-weight: bold; text-align: right;">🔴 الإجمالي العام:</td><td style="padding: 5px; font-size: 13px; font-weight: bold; text-align: center; color: #ffd700;">${grandTotal.toLocaleString('ar-SA')} جنيه</td></tr>
+            </table>
+        </div>
+    `;
+
+    html += `</div>`;
+    return html;
+}
+
+function generateFilteredExpensesReportExcel() {
+    const { filteredMaintenance, filteredViolations, filteredExpenses, filteredAdvance } = getFilteredExpensesData();
+    
+    const data = [
+        ['تقرير المصروفات (مصفاة)', '', '', ''],
+        ['التاريخ: ' + new Date().toLocaleDateString('ar-EG'), '', '', ''],
+        []
+    ];
+
+    if (filteredMaintenance.length > 0) {
+        data.push(['مصاريف الصيانة', '', '', '']);
+        data.push(['اللوحة', 'نوع الصيانة', 'التاريخ', 'المبلغ']);
+        filteredMaintenance.forEach(m => {
+            data.push([m.plate_number || '-', m.maintenance_type, m.maintenance_date, m.cost]);
+        });
+        data.push([]);
+    }
+
+    if (filteredViolations.length > 0) {
+        data.push(['مصاريف المخالفات', '', '', '']);
+        data.push(['اللوحة', 'نوع المخالفة', 'التاريخ', 'المبلغ']);
+        filteredViolations.forEach(v => {
+            data.push([v.plate_number || '-', v.violation_type, v.violation_date, v.amount]);
+        });
+        data.push([]);
+    }
+
+    if (filteredExpenses.length > 0) {
+        data.push(['مصاريف النفقات', '', '', '']);
+        data.push(['اللوحة', 'نوع النفقة', 'التاريخ', 'المبلغ']);
+        filteredExpenses.forEach(e => {
+            data.push([e.plate_number || '-', e.expense_type, e.expense_date, e.amount]);
+        });
+        data.push([]);
+    }
+
+    if (filteredAdvance.length > 0) {
+        data.push(['مصاريف العهدة', '', '', '']);
+        data.push(['الوصف', 'البيان', 'التاريخ', 'المبلغ']);
+        filteredAdvance.forEach(a => {
+            data.push([a.description || '-', a.notes || '-', a.advance_date || '-', a.amount]);
+        });
+    }
+
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'المصروفات');
+    XLSX.writeFile(wb, 'تقرير_المصروفات_مصفاة.xlsx');
+    closeExpensesFilterModal();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
