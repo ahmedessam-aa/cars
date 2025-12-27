@@ -7,60 +7,10 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <!-- صفحة تسجيل الدخول -->
-    <div id="loginPage" class="login-page">
-        <div class="login-container">
-            <div class="login-card">
-                <div class="login-header">
-                    <h1>مصنع البهنساوي</h1>
-                    <p>نظام إدارة المركبات والصيانة</p>
-                </div>
-
-                <div class="login-tabs">
-                    <button class="tab-btn active" onclick="switchTab('login')">تسجيل دخول</button>
-                    <button class="tab-btn" onclick="switchTab('register')">مستخدم جديد</button>
-                </div>
-
-                <!-- فورم الدخول -->
-                <form id="loginForm" class="login-form active-form" onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label>اسم المستخدم:</label>
-                        <input type="text" id="loginUsername" required placeholder="أدخل اسم المستخدم">
-                    </div>
-                    <div class="form-group">
-                        <label>كلمة المرور:</label>
-                        <input type="password" id="loginPassword" required placeholder="أدخل كلمة المرور">
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-full">دخول</button>
-                    <div id="loginError" class="error-message"></div>
-                </form>
-
-                <!-- فورم التسجيل -->
-                <form id="registerForm" class="login-form" onsubmit="handleRegister(event)">
-                    <div class="form-group">
-                        <label>اسم المستخدم:</label>
-                        <input type="text" id="regUsername" required placeholder="أختر اسم مستخدم">
-                    </div>
-                    <div class="form-group">
-                        <label>كلمة المرور:</label>
-                        <input type="password" id="regPassword" required placeholder="أدخل كلمة المرور">
-                    </div>
-                    <div class="form-group">
-                        <label>تأكيد كلمة المرور:</label>
-                        <input type="password" id="regPasswordConfirm" required placeholder="أعد إدخال كلمة المرور">
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-full">تسجيل</button>
-                    <div id="registerError" class="error-message"></div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- النظام الرئيسي -->
-    <div class="container" id="mainSystem" style="display: none;">
+    <div class="container" id="mainSystem">
         <!-- الرأس -->
         <header class="header">
             <div class="header-content">
@@ -70,10 +20,6 @@
             <div class="header-info">
                 <button class="btn btn-print" onclick="printPage()" title="طباعة الصفحة">🖨️ طباعة</button>
                 <span class="date-time" id="dateTime"></span>
-                <div class="user-info">
-                    <span id="currentUser"></span>
-                    <button class="btn btn-danger" onclick="handleLogout()" title="تسجيل خروج">خروج</button>
-                </div>
             </div>
         </header>
 
