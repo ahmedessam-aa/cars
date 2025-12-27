@@ -1,11 +1,8 @@
 let licenseWarningDays = 20;
 let editingVehicleId = null;
-let currentUser = null;
+let listenersInitialized = false;
 
-const SUPABASE_URL = 'https://okdukpeqdljyuphcosra.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9rZHVrcGVxZGxqeXVwaGNvc3JhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3MzcyMjYsImV4cCI6MjA3OTMxMzIyNn0.QOBk8CBQe8sz8NabxAFLOmaC0MBaYdedN09x76AEEFo';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const appData = {
     vehicles: [],
@@ -15,140 +12,10 @@ const appData = {
     advance: [],
 };
 
-function switchTab(tab) {
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    
-    tabBtns.forEach(btn => btn.classList.remove('active'));
-    loginForm.classList.remove('active-form');
-    registerForm.classList.remove('active-form');
-    
-    if (tab === 'login') {
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        loginForm.classList.add('active-form');
-    } else {
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        registerForm.classList.add('active-form');
-    }
-    
-    document.getElementById('loginError').classList.remove('show');
-    document.getElementById('registerError').classList.remove('show');
-}
 
-async function handleLogin(event) {
-    event.preventDefault();
-    const username = document.getElementById('loginUsername').value;
-    const password = document.getElementById('loginPassword').value;
-    const errorDiv = document.getElementById('loginError');
-    
-    try {
-        const { data, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('username', username)
-            .eq('password', password)
-            .single();
-        
-        if (error || !data) {
-            errorDiv.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة';
-            errorDiv.classList.add('show');
-            return;
-        }
-        
-        currentUser = username;
-        localStorage.setItem('currentUser', username);
-        showMainSystem();
-    } catch (err) {
-        errorDiv.textContent = 'حدث خطأ في الاتصال: ' + err.message;
-        errorDiv.classList.add('show');
-    }
-}
 
-async function handleRegister(event) {
-    event.preventDefault();
-    const username = document.getElementById('regUsername').value;
-    const password = document.getElementById('regPassword').value;
-    const passwordConfirm = document.getElementById('regPasswordConfirm').value;
-    const errorDiv = document.getElementById('registerError');
-    
-    if (password !== passwordConfirm) {
-        errorDiv.textContent = 'كلمات المرور غير متطابقة';
-        errorDiv.classList.add('show');
-        return;
-    }
-    
-    if (username.length < 3) {
-        errorDiv.textContent = 'اسم المستخدم يجب أن يكون 3 أحرف على الأقل';
-        errorDiv.classList.add('show');
-        return;
-    }
-    
-    if (password.length < 4) {
-        errorDiv.textContent = 'كلمة المرور يجب أن تكون 4 أحرف على الأقل';
-        errorDiv.classList.add('show');
-        return;
-    }
-    
-    try {
-        const { data, error } = await supabase
-            .from('users')
-            .insert([{ username, password }]);
-        
-        if (error) {
-            if (error.message.includes('duplicate') || error.message.includes('username')) {
-                errorDiv.textContent = 'اسم المستخدم موجود بالفعل';
-            } else {
-                errorDiv.textContent = 'خطأ في التسجيل: ' + error.message;
-            }
-            errorDiv.classList.add('show');
-            return;
-        }
-        
-        errorDiv.classList.remove('show');
-        alert('تم التسجيل بنجاح! يمكنك الآن تسجيل الدخول');
-        switchTab('login');
-        document.getElementById('loginUsername').value = username;
-        document.getElementById('regUsername').value = '';
-        document.getElementById('regPassword').value = '';
-        document.getElementById('regPasswordConfirm').value = '';
-    } catch (err) {
-        errorDiv.textContent = 'حدث خطأ: ' + err.message;
-        errorDiv.classList.add('show');
-    }
-}
-
-function handleLogout() {
-    if (confirm('هل تريد تسجيل الخروج؟')) {
-        currentUser = null;
-        localStorage.removeItem('currentUser');
-        document.getElementById('loginUsername').value = '';
-        document.getElementById('loginPassword').value = '';
-        document.getElementById('loginError').classList.remove('show');
-        switchTab('login');
-        document.getElementById('mainSystem').style.display = 'none';
-        document.getElementById('loginPage').style.display = 'flex';
-    }
-}
-
-function showMainSystem() {
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('mainSystem').style.display = 'grid';
-    document.getElementById('currentUser').textContent = `مرحباً: ${currentUser}`;
-    document.getElementById('loginUsername').value = '';
-    document.getElementById('loginPassword').value = '';
-}
-
-function checkAuthOnLoad() {
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-        currentUser = savedUser;
-        showMainSystem();
-    }
-}
-
-async function initializeApp() {
-    await loadData();
+function initializeApp() {
+    loadData();
     setupEventListeners();
     updateDateTime();
     loadLicenseWarningDays();
@@ -156,28 +23,34 @@ async function initializeApp() {
     setInterval(updateDateTime, 1000);
 }
 
-async function loadData() {
+function loadData() {
     try {
-        const [vehiclesRes, maintenanceRes, violationsRes, expensesRes, advanceRes] = await Promise.all([
-            supabase.from('vehicles').select('*').eq('username', currentUser),
-            supabase.from('maintenance').select('*').eq('username', currentUser),
-            supabase.from('violations').select('*').eq('username', currentUser),
-            supabase.from('expenses').select('*').eq('username', currentUser),
-            supabase.from('advance').select('*').eq('username', currentUser)
-        ]);
-
-        appData.vehicles = vehiclesRes.data || [];
-        appData.maintenance = maintenanceRes.data || [];
-        appData.violations = violationsRes.data || [];
-        appData.expenses = expensesRes.data || [];
-        appData.advance = advanceRes.data || [];
+        appData.vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
+        appData.maintenance = JSON.parse(localStorage.getItem('maintenance')) || [];
+        appData.violations = JSON.parse(localStorage.getItem('violations')) || [];
+        appData.expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+        appData.advance = JSON.parse(localStorage.getItem('advance')) || [];
     } catch (error) {
         console.error('خطأ في تحميل البيانات:', error);
+        // Reset to empty arrays if parsing fails
+        appData.vehicles = [];
+        appData.maintenance = [];
+        appData.violations = [];
+        appData.expenses = [];
+        appData.advance = [];
     }
 }
 
-async function saveData() {
-    console.log('Data synced with Supabase');
+function saveData() {
+    try {
+        localStorage.setItem('vehicles', JSON.stringify(appData.vehicles));
+        localStorage.setItem('maintenance', JSON.stringify(appData.maintenance));
+        localStorage.setItem('violations', JSON.stringify(appData.violations));
+        localStorage.setItem('expenses', JSON.stringify(appData.expenses));
+        localStorage.setItem('advance', JSON.stringify(appData.advance));
+    } catch (error) {
+        console.error('خطأ في حفظ البيانات:', error);
+    }
 }
 
 function loadLicenseWarningDays() {
@@ -201,6 +74,8 @@ function saveLicenseWarningDays() {
 }
 
 function setupEventListeners() {
+    if (listenersInitialized) return;
+
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -232,6 +107,8 @@ function setupEventListeners() {
             closeExpensesModal();
         }
     });
+
+    listenersInitialized = true;
 }
 
 function updateDateTime() {
@@ -311,10 +188,11 @@ function closeVehicleModal() {
     document.getElementById('vehicleForm').reset();
 }
 
-async function handleVehicleSubmit(e) {
+function handleVehicleSubmit(e) {
     e.preventDefault();
 
     const vehicleData = {
+        id: editingVehicleId || Date.now().toString(),
         plate_number: document.getElementById('plateNumber').value,
         model: document.getElementById('vehicleModel').value,
         year: parseInt(document.getElementById('vehicleYear').value),
@@ -324,25 +202,20 @@ async function handleVehicleSubmit(e) {
         license_expiry: document.getElementById('licenseExpiry').value,
         violation_count: parseInt(document.getElementById('violationCount').value) || 0,
         violation_paid: parseFloat(document.getElementById('violationPaid').value) || 0,
-        notes: document.getElementById('vehicleNotes').value,
-        username: currentUser
+        notes: document.getElementById('vehicleNotes').value
     };
 
     try {
         if (editingVehicleId) {
-            const { error } = await supabase
-                .from('vehicles')
-                .update(vehicleData)
-                .eq('id', editingVehicleId);
-            if (error) throw error;
+            const index = appData.vehicles.findIndex(v => v.id === editingVehicleId);
+            if (index !== -1) {
+                appData.vehicles[index] = vehicleData;
+            }
         } else {
-            const { error } = await supabase
-                .from('vehicles')
-                .insert([vehicleData]);
-            if (error) throw error;
+            appData.vehicles.push(vehicleData);
         }
 
-        await loadData();
+        saveData();
         closeVehicleModal();
         populateVehiclesList();
         renderDashboard();
@@ -353,15 +226,11 @@ async function handleVehicleSubmit(e) {
     }
 }
 
-async function deleteVehicle(vehicleId) {
+function deleteVehicle(vehicleId) {
     if (confirm('هل أنت متأكد من حذف هذه المركبة؟')) {
         try {
-            await supabase
-                .from('vehicles')
-                .delete()
-                .eq('id', vehicleId);
-
-            await loadData();
+            appData.vehicles = appData.vehicles.filter(v => v.id !== vehicleId);
+            saveData();
             populateVehiclesList();
             renderDashboard();
         } catch (error) {
@@ -494,30 +363,26 @@ function closeExpensesModal() {
     document.getElementById('expensesForm').reset();
 }
 
-async function handleMaintenanceSubmit(e) {
+function handleMaintenanceSubmit(e) {
     e.preventDefault();
 
     const vehicleId = document.getElementById('maintenanceVehicle').value;
     const vehicle = appData.vehicles.find(v => v.id === vehicleId);
 
     const maintenanceData = {
+        id: Date.now().toString(),
         vehicle_id: vehicleId,
         plate_number: vehicle ? vehicle.plate_number : '',
         maintenance_type: document.getElementById('maintenanceType').value,
         maintenance_date: document.getElementById('maintenanceDate').value,
         cost: parseFloat(document.getElementById('maintenanceCost').value),
         status: document.getElementById('maintenanceStatus').value,
-        notes: document.getElementById('maintenanceNotes').value,
-        username: currentUser
+        notes: document.getElementById('maintenanceNotes').value
     };
 
     try {
-        const { error } = await supabase
-            .from('maintenance')
-            .insert([maintenanceData]);
-        if (error) throw error;
-
-        await loadData();
+        appData.maintenance.push(maintenanceData);
+        saveData();
         closeMaintenanceModal();
         populateMaintenanceList();
         renderDashboard();
@@ -528,30 +393,26 @@ async function handleMaintenanceSubmit(e) {
     }
 }
 
-async function handleViolationSubmit(e) {
+function handleViolationSubmit(e) {
     e.preventDefault();
 
     const vehicleId = document.getElementById('violationVehicle').value;
     const vehicle = appData.vehicles.find(v => v.id === vehicleId);
 
     const violationData = {
+        id: Date.now().toString(),
         vehicle_id: vehicleId,
         plate_number: vehicle ? vehicle.plate_number : '',
         violation_type: document.getElementById('violationType').value,
         violation_date: document.getElementById('violationDate').value,
         amount: parseFloat(document.getElementById('violationAmount').value),
         status: document.getElementById('violationStatus').value,
-        notes: document.getElementById('violationNotes').value,
-        username: currentUser
+        notes: document.getElementById('violationNotes').value
     };
 
     try {
-        const { error } = await supabase
-            .from('violations')
-            .insert([violationData]);
-        if (error) throw error;
-
-        await loadData();
+        appData.violations.push(violationData);
+        saveData();
         closeViolationModal();
         populateViolationsList();
         renderDashboard();
@@ -562,15 +423,11 @@ async function handleViolationSubmit(e) {
     }
 }
 
-async function deleteMaintenance(maintenanceId) {
+function deleteMaintenance(maintenanceId) {
     if (confirm('هل أنت متأكد من حذف سجل الصيانة؟')) {
         try {
-            await supabase
-                .from('maintenance')
-                .delete()
-                .eq('id', maintenanceId);
-
-            await loadData();
+            appData.maintenance = appData.maintenance.filter(m => m.id !== maintenanceId);
+            saveData();
             populateMaintenanceList();
             renderDashboard();
         } catch (error) {
@@ -580,15 +437,11 @@ async function deleteMaintenance(maintenanceId) {
     }
 }
 
-async function deleteViolation(violationId) {
+function deleteViolation(violationId) {
     if (confirm('هل أنت متأكد من حذف المخالفة؟')) {
         try {
-            await supabase
-                .from('violations')
-                .delete()
-                .eq('id', violationId);
-
-            await loadData();
+            appData.violations = appData.violations.filter(v => v.id !== violationId);
+            saveData();
             populateViolationsList();
             renderDashboard();
         } catch (error) {
@@ -598,22 +451,23 @@ async function deleteViolation(violationId) {
     }
 }
 
-async function handleExpensesSubmit(e) {
+function handleExpensesSubmit(e) {
     e.preventDefault();
 
     const vehicleId = document.getElementById('expensesVehicle').value;
     const vehicle = vehicleId ? appData.vehicles.find(v => v.id === vehicleId) : null;
-    
+
     let expenseType = document.getElementById('expensesType').value;
     let isCustom = false;
     const customType = document.getElementById('customExpenseType').value;
-    
+
     if (customType) {
         expenseType = customType;
         isCustom = true;
     }
 
     const expenseData = {
+        id: editingExpenseId || Date.now().toString(),
         vehicle_id: vehicleId || null,
         plate_number: vehicle ? vehicle.plate_number : '',
         expense_type: expenseType,
@@ -621,25 +475,20 @@ async function handleExpensesSubmit(e) {
         expense_date: document.getElementById('expensesDate').value,
         amount: parseFloat(document.getElementById('expensesAmount').value),
         advance_id: document.getElementById('expensesAdvance').value || null,
-        notes: document.getElementById('expensesNotes').value,
-        username: currentUser
+        notes: document.getElementById('expensesNotes').value
     };
 
     try {
         if (editingExpenseId) {
-            const { error } = await supabase
-                .from('expenses')
-                .update(expenseData)
-                .eq('id', editingExpenseId);
-            if (error) throw error;
+            const index = appData.expenses.findIndex(e => e.id === editingExpenseId);
+            if (index !== -1) {
+                appData.expenses[index] = expenseData;
+            }
         } else {
-            const { error } = await supabase
-                .from('expenses')
-                .insert([expenseData]);
-            if (error) throw error;
+            appData.expenses.push(expenseData);
         }
 
-        await loadData();
+        saveData();
         closeExpensesModal();
         populateExpensesList();
         populateAdvanceList();
@@ -651,15 +500,11 @@ async function handleExpensesSubmit(e) {
     }
 }
 
-async function deleteExpense(expenseId) {
+function deleteExpense(expenseId) {
     if (confirm('هل أنت متأكد من حذف هذه النفقة؟')) {
         try {
-            await supabase
-                .from('expenses')
-                .delete()
-                .eq('id', expenseId);
-
-            await loadData();
+            appData.expenses = appData.expenses.filter(e => e.id !== expenseId);
+            saveData();
             populateExpensesList();
             renderDashboard();
         } catch (error) {
@@ -695,24 +540,20 @@ function closeAdvanceModal() {
     document.getElementById('advanceForm').reset();
 }
 
-async function handleAdvanceSubmit(e) {
+function handleAdvanceSubmit(e) {
     e.preventDefault();
 
     const advanceData = {
+        id: Date.now().toString(),
         amount: parseFloat(document.getElementById('advanceAmount').value),
         advance_date: document.getElementById('advanceDate').value,
         is_active: true,
-        notes: document.getElementById('advanceNotes').value,
-        username: currentUser
+        notes: document.getElementById('advanceNotes').value
     };
 
     try {
-        const { error } = await supabase
-            .from('advance')
-            .insert([advanceData]);
-        if (error) throw error;
-
-        await loadData();
+        appData.advance.push(advanceData);
+        saveData();
         closeAdvanceModal();
         populateAdvanceList();
         renderDashboard();
@@ -723,15 +564,11 @@ async function handleAdvanceSubmit(e) {
     }
 }
 
-async function deleteAdvance(advanceId) {
+function deleteAdvance(advanceId) {
     if (confirm('هل أنت متأكد من حذف هذه العهدة؟')) {
         try {
-            await supabase
-                .from('advance')
-                .delete()
-                .eq('id', advanceId);
-
-            await loadData();
+            appData.advance = appData.advance.filter(a => a.id !== advanceId);
+            saveData();
             populateAdvanceList();
             renderDashboard();
         } catch (error) {
@@ -1162,30 +999,29 @@ function generateVehiclesReportPDF() {
 
 function generateVehiclesReportHTML() {
     let html = `
-        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 4px; margin: 0;">
-            <div style="text-align: center; margin-bottom: 4px; border-bottom: 1px solid #333; padding-bottom: 3px;">
-                <h1 style="margin: 0; font-size: 14px; color: #1a252f; font-weight: bold;">مصنع البهنساوي</h1>
-                <h2 style="margin: 2px 0 0 0; font-size: 10px; color: #34495e;">تقرير المركبات - ${new Date().toLocaleDateString('ar-EG')}</h2>
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 4px; margin: 0; position: relative;">
+            <img src="667.jpg" style="position: absolute; top: 0; left: 0; width: 80px; height: 60px; object-fit: contain;">
+            <div style="text-align: center; margin-bottom: 4px; border-bottom: 2px solid #2c3e50; padding-bottom: 3px; margin-top: 20px;">
+                <h1 style="margin: 0; font-size: 16px; color: #2c3e50; font-weight: bold;">مصنع البهنساوي</h1>
+                <h2 style="margin: 2px 0 0 0; font-size: 12px; color: #34495e;">تقرير المركبات - ${new Date().toLocaleDateString('ar-EG')}</h2>
             </div>
-            <table style="width: 100%; border-collapse: collapse; margin: 2px 0; line-height: 1.2;">
+            <table style="width: 100%; border-collapse: collapse; margin: 4px 0; line-height: 1.4;">
                 <thead>
-                    <tr style="background-color: #1a252f; color: white; height: 13px;">
-                        <th style="padding: 2px 4px; text-align: right; border: 1px solid #666; font-size: 9px; font-weight: bold;">اللوحة</th>
-                        <th style="padding: 2px 4px; text-align: right; border: 1px solid #666; font-size: 9px; font-weight: bold;">النموذج</th>
-                        <th style="padding: 2px 4px; text-align: right; border: 1px solid #666; font-size: 9px; font-weight: bold;">السائق</th>
-                        <th style="padding: 2px 4px; text-align: right; border: 1px solid #666; font-size: 9px; font-weight: bold;">السنة</th>
-                        <th style="padding: 2px 4px; text-align: right; border: 1px solid #666; font-size: 9px; font-weight: bold;">الحالة</th>
-                        <th style="padding: 2px 4px; text-align: right; border: 1px solid #666; font-size: 9px; font-weight: bold;">انتهاء الرخصة</th>
-                        <th style="padding: 2px 4px; text-align: right; border: 1px solid #666; font-size: 9px; font-weight: bold;">ملاحظات</th>
+                    <tr style="background-color: #2c3e50; color: white; height: 18px;">
+                        <th style="padding: 4px 6px; text-align: right; border: 2px solid #34495e; font-size: 12px; font-weight: bold;">اللوحة</th>
+                        <th style="padding: 4px 6px; text-align: right; border: 2px solid #34495e; font-size: 12px; font-weight: bold;">النموذج</th>
+                        <th style="padding: 4px 6px; text-align: right; border: 2px solid #34495e; font-size: 12px; font-weight: bold;">السائق</th>
+                        <th style="padding: 4px 6px; text-align: right; border: 2px solid #34495e; font-size: 12px; font-weight: bold;">الحالة</th>
+                        <th style="padding: 4px 6px; text-align: right; border: 2px solid #34495e; font-size: 12px; font-weight: bold;">انتهاء الرخصة</th>
                     </tr>
                 </thead>
                 <tbody>
     `;
 
     appData.vehicles.forEach((vehicle, index) => {
-        const bgColor = index % 2 === 0 ? '#ffffff' : '#f0f0f0';
-        const statusColor = vehicle.status === 'اخضر' ? '#27ae60' : vehicle.status === 'مطحون' ? '#e74c3c' : vehicle.status === 'نقل موظفين' ? '#f39c12' : '#3498db';
-        html += `<tr style="background-color: ${bgColor}; height: 12px;"><td style="padding: 2px 3px; border: 0.5px solid #ccc; font-size: 9px; font-weight: bold;">${vehicle.plate_number}</td><td style="padding: 2px 3px; border: 0.5px solid #ccc; font-size: 9px;">${vehicle.model}</td><td style="padding: 2px 3px; border: 0.5px solid #ccc; font-size: 8px;">${vehicle.vin_number || '-'}</td><td style="padding: 2px 3px; border: 0.5px solid #ccc; font-size: 9px;">${vehicle.year}</td><td style="padding: 2px 3px; border: 0.5px solid #ccc; font-size: 9px; color: white; background-color: ${statusColor}; font-weight: bold; text-align: center;">${vehicle.status}</td><td style="padding: 2px 3px; border: 0.5px solid #ccc; font-size: 9px;">${vehicle.license_expiry}</td><td style="padding: 2px 3px; border: 0.5px solid #ccc; font-size: 8px;">${(vehicle.notes || '-').substring(0, 15)}</td></tr>`;
+        const bgColor = index % 2 === 0 ? '#ffffff' : '#f8f9fa';
+        const statusColor = vehicle.status === 'اخضر' ? '#27ae60' : vehicle.status === 'ملاكي' ? '#3498db' : vehicle.status === 'نقل موظفين' ? '#f39c12' : '#6c757d';
+        html += `<tr style="background-color: ${bgColor}; height: 16px;"><td style="padding: 3px 4px; border: 1px solid #dee2e6; font-size: 12px; font-weight: bold; color: #2c3e50;">${vehicle.plate_number}</td><td style="padding: 3px 4px; border: 1px solid #dee2e6; font-size: 12px; color: #495057;">${vehicle.model}</td><td style="padding: 3px 4px; border: 1px solid #dee2e6; font-size: 11px; color: #6c757d;">${vehicle.vin_number || '-'}</td><td style="padding: 3px 4px; border: 1px solid #dee2e6; font-size: 12px; color: white; background-color: ${statusColor}; font-weight: bold; text-align: center;">${vehicle.status}</td><td style="padding: 3px 4px; border: 1px solid #dee2e6; font-size: 12px; color: #495057;">${vehicle.license_expiry}</td></tr>`;
     });
 
     html += `</tbody></table></div>`;
@@ -1237,10 +1073,11 @@ function generateMaintenanceReportPDF() {
 
 function generateMaintenanceReportHTML() {
     let html = `
-        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px;">
-            <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px;">
-                <h1 style="margin: 0; font-size: 24px;">مصنع البهنساوي</h1>
-                <h2 style="margin: 5px 0; font-size: 18px;">تقرير الصيانة والتصليح</h2>
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px; position: relative;">
+            <img src="667.jpg" style="position: absolute; top: 0; left: 0; width: 80px; height: 60px; object-fit: contain;">
+            <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px; margin-top: 20px;">
+                <h1 style="margin: 0; font-size: 24px; font-weight: bold;">مصنع البهنساوي</h1>
+                <h2 style="margin: 5px 0; font-size: 18px; font-weight: bold;">تقرير الصيانة والتصليح</h2>
                 <p style="margin: 5px 0; font-size: 12px; color: #666;">
                     التاريخ: ${new Date().toLocaleDateString('ar-EG')}
                 </p>
@@ -1346,10 +1183,11 @@ function generateExpensesReportPDF() {
 
 function generateExpensesReportHTML() {
     let html = `
-        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 8px; margin: 0;">
-            <div style="text-align: center; margin-bottom: 8px; border-bottom: 2px solid #1a252f; padding-bottom: 6px;">
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 8px; margin: 0; position: relative;">
+            <img src="667.jpg" style="position: absolute; top: 0; left: 0; width: 80px; height: 60px; object-fit: contain;">
+            <div style="text-align: center; margin-bottom: 8px; border-bottom: 2px solid #1a252f; padding-bottom: 6px; margin-top: 20px;">
                 <h1 style="margin: 0; font-size: 16px; color: #1a252f; font-weight: bold;">مصنع البهنساوي</h1>
-                <h2 style="margin: 3px 0 0 0; font-size: 12px; color: #34495e;">تقرير المصروفات والعهدة الشامل</h2>
+                <h2 style="margin: 3px 0 0 0; font-size: 12px; color: #34495e; font-weight: bold;">تقرير المصروفات والعهدة الشامل</h2>
                 <p style="margin: 2px 0; font-size: 9px; color: #666;">التاريخ: ${new Date().toLocaleDateString('ar-EG')}</p>
             </div>
     `;
@@ -1586,10 +1424,11 @@ function generateLicensesReportHTML() {
     const now = new Date();
 
     let html = `
-        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px;">
-            <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px;">
-                <h1 style="margin: 0; font-size: 24px;">مصنع البهنساوي</h1>
-                <h2 style="margin: 5px 0; font-size: 18px;">تقرير الرخص</h2>
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px; position: relative;">
+            <img src="667.jpg" style="position: absolute; top: 0; left: 0; width: 80px; height: 60px; object-fit: contain;">
+            <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px; margin-top: 20px;">
+                <h1 style="margin: 0; font-size: 24px; font-weight: bold;">مصنع البهنساوي</h1>
+                <h2 style="margin: 5px 0; font-size: 18px; font-weight: bold;">تقرير الرخص</h2>
                 <p style="margin: 5px 0; font-size: 12px; color: #666;">
                     التاريخ: ${new Date().toLocaleDateString('ar-EG')}
                 </p>
@@ -1696,10 +1535,11 @@ function generateViolationsReportPDF() {
 
 function generateViolationsReportHTML() {
     let html = `
-        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px;">
-            <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px;">
-                <h1 style="margin: 0; font-size: 24px;">مصنع البهنساوي</h1>
-                <h2 style="margin: 5px 0; font-size: 18px;">تقرير المخالفات المرورية</h2>
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px; position: relative;">
+            <img src="667.jpg" style="position: absolute; top: 0; left: 0; width: 80px; height: 60px; object-fit: contain;">
+            <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px; margin-top: 20px;">
+                <h1 style="margin: 0; font-size: 24px; font-weight: bold;">مصنع البهنساوي</h1>
+                <h2 style="margin: 5px 0; font-size: 18px; font-weight: bold;">تقرير المخالفات المرورية</h2>
                 <p style="margin: 5px 0; font-size: 12px; color: #666;">
                     التاريخ: ${new Date().toLocaleDateString('ar-EG')}
                 </p>
@@ -1849,8 +1689,9 @@ function generateAdvanceExpensesReportHTML() {
     `;
 
     let html = `
-        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 10px; line-height: 1.4;">
-            <div style="text-align: center; margin-bottom: 10px; border-bottom: 3px solid #2c3e50; padding-bottom: 8px;">
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 10px; line-height: 1.4; position: relative;">
+            <img src="667.jpg" style="position: absolute; top: 0; left: 0; width: 80px; height: 60px; object-fit: contain;">
+            <div style="text-align: center; margin-bottom: 10px; border-bottom: 3px solid #2c3e50; padding-bottom: 8px; margin-top: 20px;">
                 <h1 style="margin: 0; font-size: 24px; font-weight: bold;">مصنع البهنساوي</h1>
                 <h2 style="margin: 2px 0; font-size: 15px; font-weight: bold;">تقرير المصروفات والعهدة</h2>
                 <p style="margin: 2px 0; font-size: 10px; color: #666;">
@@ -1961,22 +1802,17 @@ function printAdvanceExpensesReport() {
     printWindow.print();
 }
 
-async function confirmClearAllData() {
-    if (confirm('تحذير: هذا سيحذف جميع بيانات حسابك بشكل نهائي. هل أنت متأكد؟')) {
+function confirmClearAllData() {
+    if (confirm('تحذير: هذا سيحذف جميع بياناتك بشكل نهائي. هل أنت متأكد؟')) {
         if (confirm('هل أنت متأكد تماماً؟ لا يمكن التراجع عن هذا الإجراء!')) {
             try {
-                await supabase.from('violations').delete().eq('username', currentUser);
-                await supabase.from('maintenance').delete().eq('username', currentUser);
-                await supabase.from('expenses').delete().eq('username', currentUser);
-                await supabase.from('advance').delete().eq('username', currentUser);
-                await supabase.from('vehicles').delete().eq('username', currentUser);
-                
                 appData.vehicles = [];
                 appData.maintenance = [];
                 appData.violations = [];
                 appData.expenses = [];
                 appData.advance = [];
-                alert('تم حذف جميع بيانات حسابك');
+                saveData();
+                alert('تم حذف جميع البيانات');
                 renderDashboard();
             } catch (error) {
                 console.error('خطأ:', error);
@@ -2094,10 +1930,11 @@ function generateFilteredExpensesReportHTML() {
     const { filteredMaintenance, filteredViolations, filteredExpenses, filteredAdvance } = getFilteredExpensesData();
     
     let html = `
-        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 10px; margin: 0;">
-            <div style="text-align: center; margin-bottom: 12px; border-bottom: 2px solid #333; padding-bottom: 8px;">
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 10px; margin: 0; position: relative;">
+            <img src="667.jpg" style="position: absolute; top: 0; left: 0; width: 80px; height: 60px; object-fit: contain;">
+            <div style="text-align: center; margin-bottom: 12px; border-bottom: 2px solid #333; padding-bottom: 8px; margin-top: 20px;">
                 <h1 style="margin: 0; font-size: 18px; color: #1a252f; font-weight: bold;">مصنع البهنساوي</h1>
-                <h2 style="margin: 4px 0 0 0; font-size: 13px; color: #34495e;">تقرير المصروفات (مصفاة)</h2>
+                <h2 style="margin: 4px 0 0 0; font-size: 13px; color: #34495e; font-weight: bold;">تقرير المصروفات (مصفاة)</h2>
                 <p style="margin: 3px 0; font-size: 10px; color: #666;">التاريخ: ${new Date().toLocaleDateString('ar-EG')}</p>
             </div>
     `;
@@ -2284,9 +2121,8 @@ function generateFilteredExpensesReportExcel() {
     closeExpensesFilterModal();
 }
 
+
+
 document.addEventListener('DOMContentLoaded', () => {
-    checkAuthOnLoad();
-    if (currentUser) {
-        initializeApp();
-    }
+    initializeApp();
 });
